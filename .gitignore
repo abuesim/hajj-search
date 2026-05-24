@@ -1,0 +1,4 @@
+*.xls
+*.xlsx
+pilgrims_data.json
+.claude/
