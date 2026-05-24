@@ -1,4 +1,11 @@
 *.xls
 *.xlsx
+*.csv
+*.CSV
+*.psd
+*.pdf
 pilgrims_data.json
 .claude/
+.DS_Store
+hajj_site/
+_preview_test.html
