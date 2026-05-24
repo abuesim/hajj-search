@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>بطاقة حاج</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:linear-gradient(135deg,#0d4f3c,#1a7a5e);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+  .card{background:white;border-radius:24px;overflow:hidden;max-width:360px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+  .card-top{background:linear-gradient(135deg,#1a7a5e,#0d4f3c);padding:28px 24px 22px;text-align:center}
+  .co{color:rgba(255,255,255,.65);font-size:.72rem;letter-spacing:1px;margin-bottom:10px}
+  .plbl{color:rgba(255,255,255,.55);font-size:.68rem;margin-bottom:6px;letter-spacing:.5px}
+  .pname{color:#f5d06e;font-size:1.35rem;font-weight:700;line-height:1.45}
+  .card-body{padding:18px 20px 16px;display:flex;flex-direction:column;gap:10px}
+  .row{display:flex;gap:10px}
+  .box{flex:1;border-radius:12px;padding:12px 10px;text-align:center;border:1.5px solid #e0f5ef;background:#f8fffe}
+  .box.bus{border-color:#fde8c0;background:#fffbf3}
+  .box.mina{border-color:#c0d8fd;background:#f3f8ff}
+  .lbl{font-size:.64rem;color:#999;display:block;margin-bottom:3px;font-weight:600;letter-spacing:.5px}
+  .val{font-size:1.25rem;font-weight:800;color:#0d4f3c;display:block}
+  .bus .val{font-size:2rem;color:#e07b00}
+  .mina .val{font-size:1rem;color:#1a4a7a;direction:ltr}
+  .foot{background:#f7f7f7;padding:10px 20px;text-align:center;border-top:1px solid #eee;font-size:.62rem;color:#aaa}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="card-top">
+    <div class="co">🕋 يسر مساند</div>
+    <div class="plbl">الحاج / الحاجة</div>
+    <div class="pname" id="cn">—</div>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="box"><span class="lbl">رقم الحجز</span><span class="val" id="cr" style="font-size:1.1rem">—</span></div>
+      <div class="box bus"><span class="lbl">الباص</span><span class="val" id="cb">—</span></div>
+    </div>
+    <div class="box mina" id="minaBox"><span class="lbl">سكن منى</span><span class="val" id="cm">—</span></div>
+  </div>
+  <div class="foot">الحملة المحيمد للحج والعمرة</div>
+</div>
+<script>
+  const p=new URLSearchParams(location.search);
+  document.getElementById('cn').textContent=p.get('n')||'—';
+  document.getElementById('cr').textContent=p.get('r')||'—';
+  document.getElementById('cb').textContent=p.get('b')||'—';
+  const m=p.get('m');
+  if(m){document.getElementById('cm').textContent=m;}
+  else{document.getElementById('minaBox').style.display='none';}
+</script>
+</body>
+</html>
