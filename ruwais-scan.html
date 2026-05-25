@@ -3,94 +3,41 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>بحث حجاج يسر مساند</title>
+<title>البحث السريع</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:linear-gradient(135deg,#2b3039 0%,#4a525e 50%,#2b3039 100%);min-height:100vh;padding:0 0 40px}
-  header{background:rgba(0,0,0,.25);padding:16px 16px 14px;text-align:center;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.1)}
-  .hdr-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-  header h1{color:#f5d06e;font-size:1.15rem;font-weight:700;display:flex;align-items:center;gap:8px}
-  .nav-link{background:rgba(255,255,255,.15);color:#f5d06e;border-radius:10px;padding:6px 11px;font-size:.78rem;font-weight:700;text-decoration:none;border:1px solid rgba(245,208,110,.3)}
+  header{background:rgba(0,0,0,.25);padding:14px 16px;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.1)}
   .campaign-switch{display:flex;gap:8px;margin-bottom:12px}.camp-btn{flex:1;text-align:center;padding:9px 10px;border-radius:10px;font-size:.85rem;font-weight:700;text-decoration:none;border:1.5px solid rgba(245,208,110,.45);color:#f5d06e;background:rgba(255,255,255,.08);transition:.15s}.camp-btn.active{background:#f5d06e;color:#2b3039;border-color:#f5d06e}.camp-btn:active{transform:scale(.97)}
-  .search-wrap{position:relative}
-  #searchInput{width:100%;padding:14px 48px 14px 16px;border-radius:14px;border:2px solid rgba(245,208,110,.4);background:rgba(255,255,255,.95);font-size:1.05rem;color:#1a1a1a;font-family:inherit;outline:none;text-align:right;transition:.2s}
-  #searchInput:focus{border-color:#f5d06e;box-shadow:0 0 0 3px rgba(245,208,110,.2)}
-  #searchInput::placeholder{color:#999;font-size:.95rem}
-  .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#4a525e;font-size:1.2rem;pointer-events:none}
-  .clear-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:#ddd;border:none;border-radius:50%;width:26px;height:26px;font-size:.85rem;cursor:pointer;display:none;align-items:center;justify-content:center;color:#666}
-  .clear-btn.visible{display:flex}
-  .search-actions{display:flex;gap:8px;margin-top:10px}
-  .btn-scan{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;background:#f5d06e;color:#2b3039;border:none;border-radius:12px;padding:12px 10px;font-size:.93rem;font-weight:800;cursor:pointer;font-family:inherit;transition:.15s}
-  .btn-scan:active{transform:scale(.97)}
-  .btn-adv{display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(255,255,255,.15);color:#f5d06e;border:1.5px solid rgba(245,208,110,.4);border-radius:12px;padding:12px 14px;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:.15s}
-  .btn-adv.active{background:#f5d06e;color:#2b3039;border-color:#f5d06e}
-  .btn-adv:active{transform:scale(.97)}
-  .adv-panel{display:none;background:rgba(0,0,0,.18);border-radius:14px;padding:14px;margin-top:10px;border:1px solid rgba(255,255,255,.1)}
-  .adv-panel.open{display:block;animation:fadeUp .18s ease}
-  .adv-row{display:flex;gap:8px;margin-bottom:10px;align-items:flex-end}
-  .adv-row:last-child{margin-bottom:0}
-  .adv-field{flex:1;display:flex;flex-direction:column;gap:4px}
-  .adv-label{color:rgba(255,255,255,.65);font-size:.72rem;font-weight:700}
-  .adv-input{padding:9px 12px;border-radius:10px;border:1.5px solid rgba(255,255,255,.2);background:rgba(255,255,255,.92);font-size:.95rem;color:#1a1a1a;font-family:inherit;outline:none;width:100%;direction:ltr}
-  .adv-input:focus{border-color:#f5d06e}
-  .adv-select{padding:9px 12px;border-radius:10px;border:1.5px solid rgba(255,255,255,.2);background:rgba(255,255,255,.92);font-size:.88rem;color:#1a1a1a;font-family:inherit;outline:none;width:100%;appearance:none;-webkit-appearance:none;direction:rtl}
-  .adv-select:focus{border-color:#f5d06e}
-  .gender-grp{display:flex;gap:6px}
-  .gender-btn{flex:1;padding:8px 6px;border-radius:9px;border:1.5px solid rgba(255,255,255,.25);background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);font-size:.82rem;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s;text-align:center}
-  .gender-btn.active{background:#f5d06e;color:#2b3039;border-color:#f5d06e}
-  .adv-clear{background:rgba(239,68,68,.25);color:#fca5a5;border:1.5px solid rgba(239,68,68,.35);border-radius:9px;padding:9px 13px;font-size:.82rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
-  .adv-clear:active{transform:scale(.97)}
-  .adv-badge{display:inline-block;background:#ef4444;color:#fff;border-radius:50%;width:16px;height:16px;font-size:.62rem;font-weight:800;text-align:center;line-height:16px;margin-right:2px}
-  #results{padding:16px;max-width:600px;margin:0 auto}
-  .state-msg{text-align:center;color:rgba(255,255,255,.7);margin-top:60px;font-size:1rem}
-  .state-msg .icon{font-size:3rem;display:block;margin-bottom:12px}
-  .result-card{background:white;border-radius:18px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.18);margin-bottom:20px;animation:fadeUp .25s ease}
+  .hdr-row{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
+  header h1{color:#f5d06e;font-size:1.1rem;font-weight:700}
+  .nav-link{background:rgba(255,255,255,.15);color:#f5d06e;border-radius:10px;padding:6px 11px;font-size:.78rem;font-weight:700;text-decoration:none;border:1px solid rgba(245,208,110,.3)}
+  #scanWrap{max-width:480px;margin:16px auto 0;padding:0 16px}
+  #reader{border-radius:18px;overflow:hidden;border:3px solid rgba(245,208,110,.55);background:#000;min-height:140px}
+  #scanHint{text-align:center;color:rgba(255,255,255,.9);font-size:.95rem;margin-top:14px;background:rgba(0,0,0,.22);padding:12px;border-radius:12px;line-height:1.6}
+  #result{max-width:480px;margin:0 auto;padding:0 16px}
+  .result-card{background:white;border-radius:18px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.22);animation:fadeUp .25s ease;margin-top:16px}
   @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-  .card-header{background:linear-gradient(135deg,#4a525e,#2b3039);padding:18px 18px 14px;color:white}
-  .pilgrim-name{font-size:1.2rem;font-weight:700;line-height:1.4;color:#f5d06e;margin-bottom:4px}
-  .pilgrim-label{font-size:.75rem;color:rgba(255,255,255,.6);letter-spacing:1px}
-  .card-body{padding:16px 18px;display:flex;gap:12px}
-  .info-box{flex:1;background:#fafbfc;border-radius:12px;padding:12px 14px;text-align:center;border:1.5px solid #e4e7ec}
-  .info-box .label{font-size:.7rem;color:#888;display:block;margin-bottom:4px;font-weight:600;letter-spacing:.5px}
-  .info-box .value{font-size:1.35rem;font-weight:800;color:#2b3039;direction:ltr;display:block}
-  .info-box.bus .value{font-size:2rem;color:#e07b00}
-  .info-box.bus{border-color:#fde8c0;background:#fffbf3}
-  .info-box.mina .value{font-size:1.05rem;color:#1a4a7a;direction:ltr}
-  .info-box.mina{border-color:#c0d8fd;background:#f3f8ff}
-  .qr-btn{background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.35);border-radius:10px;padding:7px 10px;color:white;font-size:1.15rem;cursor:pointer;flex-shrink:0;margin-top:2px;line-height:1}
-  .qr-modal{display:none;position:fixed;inset:0;z-index:9990;background:rgba(0,0,0,.88);align-items:center;justify-content:center;padding:24px}
-  .qr-box{background:white;border-radius:24px;padding:28px 24px 22px;text-align:center;max-width:320px;width:100%}
-  .qr-pname{font-size:1rem;font-weight:700;color:#2b3039;margin-bottom:16px;line-height:1.5}
-  .qr-img{width:220px;height:220px;border-radius:12px;display:block;margin:0 auto 10px}
-  .qr-hint{font-size:.75rem;color:#888;margin-bottom:16px}
-  .qr-close{background:#2b3039;color:white;border:none;border-radius:12px;padding:10px 32px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:inherit}
-  .scan-modal{display:none;position:fixed;inset:0;z-index:9991;background:rgba(0,0,0,.92);flex-direction:column;align-items:center;justify-content:flex-start;padding:20px 16px}
-  .scan-modal.open{display:flex;animation:fadeUp .2s ease}
-  .scan-hdr{width:100%;max-width:480px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-  .scan-title{color:#f5d06e;font-size:1.05rem;font-weight:700}
-  .scan-close{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:white;border-radius:10px;padding:8px 14px;font-size:.85rem;font-weight:700;cursor:pointer;font-family:inherit}
-  #scanReader{border-radius:18px;overflow:hidden;border:3px solid rgba(245,208,110,.55);background:#111;width:100%;max-width:480px}
-  #scanHint{color:rgba(255,255,255,.8);font-size:.9rem;margin-top:12px;text-align:center;max-width:360px;line-height:1.6}
-  .group-banner{background:linear-gradient(90deg,#e07b00,#f5a623);color:white;text-align:center;padding:8px 16px;font-size:.82rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px}
-  .group-list{padding:10px 14px 14px}
-  .group-member{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;border-bottom:1px solid #f0f0f0}
+  .card-header{background:linear-gradient(135deg,#4a525e,#2b3039);padding:18px;color:white}
+  .pilgrim-name{font-size:1.35rem;font-weight:700;color:#f5d06e}
+  .pilgrim-label{font-size:.75rem;color:rgba(255,255,255,.6)}
+  .card-body{padding:16px 18px;display:flex;gap:12px;flex-wrap:wrap}
+  .info-box{flex:1;min-width:88px;background:#fafbfc;border-radius:12px;padding:12px;text-align:center;border:1.5px solid #e4e7ec}
+  .info-box .label{font-size:.7rem;color:#888;display:block;margin-bottom:4px;font-weight:600}
+  .info-box .value{font-size:1.3rem;font-weight:800;color:#2b3039;direction:ltr;display:block}
+  .info-box.bus .value{color:#e07b00;font-size:2rem}
+  .info-box.mina .value{font-size:1.15rem;color:#1a4a7a}
+  .group-banner{background:linear-gradient(90deg,#e07b00,#f5a623);color:white;text-align:center;padding:8px;font-size:.82rem;font-weight:700}
+  .group-list{padding:10px 14px}
+  .group-member{display:flex;align-items:center;gap:10px;padding:9px 6px;border-bottom:1px solid #f0f0f0}
   .group-member:last-child{border-bottom:none}
-  .group-member.is-self{background:#f2f4f7}
   .member-num{width:26px;height:26px;border-radius:50%;background:#4a525e;color:white;font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-  .member-num.self{background:#f5d06e;color:#2b3039}
   .member-name{font-size:.92rem;color:#1a1a1a;font-weight:500;flex:1}
-  .you-badge{font-size:.65rem;background:#4a525e;color:white;padding:2px 7px;border-radius:20px;font-weight:700}
-  .member-mina{font-size:.72rem;color:#1a4a7a;font-weight:700;background:#eef4ff;border-radius:6px;padding:2px 7px;direction:ltr;white-space:nowrap;margin-right:auto}
-  .wa-ic{display:inline-flex;align-items:center;justify-content:center;background:#25D366;border-radius:10px;text-decoration:none;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.2)}
-  .wa-ic svg{fill:#fff}
-  .wa-card{padding:0 16px;align-self:stretch}
-  .wa-card svg{width:26px;height:26px}
-  .wa-mini{width:30px;height:30px}
-  .wa-mini svg{width:18px;height:18px}
-  .rpt-btn-ic{display:inline-flex;align-items:center;justify-content:center;width:40px;background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.35);border-radius:10px;color:#fff;cursor:pointer;flex-shrink:0;margin-top:2px;padding:7px 6px;line-height:1}.rpt-btn-ic svg{width:20px;height:20px}.rpt-btn-ic:active{transform:scale(.92)}.rpt-mini{width:30px;height:30px;background:#fff;border:1px solid #f0c8c8;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:#666;padding:0}.rpt-mini svg{width:18px;height:18px}
-  .no-result{text-align:center;margin-top:60px;color:rgba(255,255,255,.8);animation:fadeUp .25s ease}
-  .no-result .icon{font-size:3rem;display:block;margin-bottom:12px}
-  .count-badge{display:inline-block;background:rgba(255,255,255,.15);border-radius:20px;padding:3px 10px;font-size:.78rem;color:rgba(255,255,255,.9);margin-bottom:8px}
+  .member-mina{font-size:.72rem;color:#1a4a7a;font-weight:700;background:#eef4ff;border-radius:6px;padding:2px 7px;direction:ltr;white-space:nowrap}
+  .wa-ic{display:inline-flex;width:30px;height:30px;background:#25D366;border-radius:8px;align-items:center;justify-content:center;flex-shrink:0}
+  .wa-ic svg{width:18px;height:18px;fill:#fff}
+  .rescan-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:16px;background:#f5d06e;color:#2b3039;border:none;border-radius:14px;padding:17px;font-size:1.1rem;font-weight:800;cursor:pointer;font-family:inherit}
+  .rescan-btn:active{transform:scale(.97)}
   
   #lockScreen{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#2b3039,#4a525e);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
   .lock-box{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:24px;padding:32px 24px 28px;width:100%;max-width:320px;text-align:center;backdrop-filter:blur(12px)}
@@ -117,7 +64,7 @@
   <div class="lock-box">
     <div class="lock-icon">🔐</div>
     <h2>حملة الرويس</h2>
-    <div class="lock-page">البحث عن الحجاج</div>
+    <div class="lock-page">البحث السريع</div>
     <p>أدخل كلمة المرور</p>
     <div id="pinDisplay" class="pin-display">
       <span class="pin-dot" id="pd0"></span>
@@ -146,64 +93,10 @@
 </div>
 <header>
   <div class="campaign-switch"><a href="muhaimeed.html" class="camp-btn ">شركة المحيميد</a><a href="ruwais.html" class="camp-btn active">شركة الرويس</a></div>
-  <div class="hdr-row">
-    <h1>🕋 بحث حجاج الرويس <span style="font-size:.55em;opacity:.6;font-weight:400">v1.2</span></h1>
-    <div style="display:flex;gap:5px;flex-shrink:0"><a href="ruwais-dashboard.html" class="nav-link">📊 لوحة</a><a href="ruwais-reports.html" class="nav-link">🚩 بلاغات</a><a href="ruwais-manifest.html" class="nav-link">📋 بيانات</a></div>
-  </div>
-  <div class="search-wrap">
-    <input type="search" id="searchInput" placeholder="ابحث بالاسم أو الهوية أو الجوال..." autocomplete="off" autocorrect="off" spellcheck="false" inputmode="search">
-    <span class="search-icon">🔍</span>
-    <button class="clear-btn" id="clearBtn" onclick="clearSearch()">✕</button>
-  </div>
-  <div class="search-actions">
-    <button class="btn-scan" onclick="openScan()">📷 مسح باركود الهوية</button>
-    <button class="btn-adv" id="advToggle" onclick="toggleAdv()">⚙️ بحث متقدم <span id="advBadge" style="display:none" class="adv-badge">0</span></button>
-  </div>
-  <div class="adv-panel" id="advPanel">
-    <div class="adv-row">
-      <div class="adv-field">
-        <span class="adv-label">🚌 رقم الباص</span>
-        <input class="adv-input" id="fBus" type="number" min="1" placeholder="مثال: 8" oninput="doSearch()">
-      </div>
-      <div class="adv-field">
-        <span class="adv-label">🏙️ المكتب</span>
-        <select class="adv-select" id="fOffice" onchange="doSearch()">
-          <option value="">الكل</option>
-        </select>
-      </div>
-    </div>
-    <div class="adv-row">
-      <div class="adv-field">
-        <span class="adv-label">👤 الجنس</span>
-        <div class="gender-grp">
-          <button class="gender-btn active" id="gAll" onclick="setGender('')">الكل</button>
-          <button class="gender-btn" id="gM" onclick="setGender('ذكر')">رجال</button>
-          <button class="gender-btn" id="gF" onclick="setGender('أنثى')">نساء</button>
-        </div>
-      </div>
-      <button class="adv-clear" onclick="clearAdv()">✕ مسح الفلاتر</button>
-    </div>
-  </div>
+  <div class="hdr-row"><h1>📷 البحث السريع</h1><a href="ruwais.html" class="nav-link">🔍 بحث عادي</a></div>
 </header>
-<div id="results">
-  <div class="state-msg"><span class="icon">🔍</span><p>ابحث عن الحاج للعثور على معلومات الحجز والباص</p></div>
-</div>
-<div id="qrModal" class="qr-modal" onclick="closeQR()">
-  <div class="qr-box" onclick="event.stopPropagation()">
-    <div id="qrModalName" class="qr-pname"></div>
-    <img id="qrImg" src="" alt="QR" class="qr-img">
-    <p class="qr-hint">📷 امسح بكاميرا الجوال لعرض البطاقة</p>
-    <button class="qr-close" onclick="closeQR()">إغلاق</button>
-  </div>
-</div>
-<div id="scanModal" class="scan-modal">
-  <div class="scan-hdr">
-    <span class="scan-title">📷 مسح باركود الهوية</span>
-    <button class="scan-close" onclick="closeScan()">إغلاق ✕</button>
-  </div>
-  <div id="scanReader"></div>
-  <div id="scanHint">وجّه الكاميرا على باركود الهوية الوطنية أو الإقامة</div>
-</div>
+<div id="scanWrap"><div id="reader"></div><div id="scanHint">📷 وجّه الكاميرا على باركود الهوية</div></div>
+<div id="result"></div>
 <script src="html5-qrcode.min.js"></script>
 <script>
 
@@ -241,125 +134,42 @@ async function initAuth(){
     catch{sessionStorage.clear();}
   }
 }
-let DATA=[],searchResults=[];const byId={},byPhone={},byResv={};
-let _fGender='';
 const WA_SVG='<svg viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38c1.45.79 3.08 1.21 4.79 1.21h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm5.8 14.04c-.24.68-1.42 1.31-1.96 1.39-.5.07-1.13.1-1.83-.11-.42-.13-.96-.31-1.65-.61-2.9-1.25-4.8-4.17-4.95-4.36-.14-.19-1.18-1.57-1.18-2.99s.75-2.12 1.01-2.41c.26-.29.57-.36.76-.36.19 0 .38 0 .54.01.18.01.41-.07.64.49.24.57.81 1.97.88 2.11.07.14.12.31.02.5-.09.19-.14.31-.28.47-.14.17-.29.37-.42.5-.14.14-.28.29-.12.56.17.28.74 1.22 1.59 1.98 1.1.97 2.02 1.27 2.3 1.42.28.14.45.12.61-.07.17-.19.7-.82.89-1.1.18-.28.37-.23.61-.14.25.09 1.57.74 1.84.88.27.14.45.2.51.31.07.11.07.63-.17 1.31z"/></svg>';function waLink(ph){let n=(ph||'').replace(/\D/g,'');if(!n)return'';if(n[0]==='0')n=n.slice(1);if(n.indexOf('966')!==0)n='966'+n;return'https://wa.me/'+n;}
-const SUPA_URL='https://crpcgsznwqrphgfapthw.supabase.co';const SUPA_KEY='sb_publishable_6l1ngkrRbe6UwQjiaj5O3Q_hLa4QCjG';const SUPA_H={apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY,'Content-Type':'application/json'};async function _ckey(p,salt){const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(p),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:100000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);}async function encB64(o,p){const s=crypto.getRandomValues(new Uint8Array(16)),n=crypto.getRandomValues(new Uint8Array(12));const k=await _ckey(p,s);const e=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv:n},k,new TextEncoder().encode(JSON.stringify(o))));const b=new Uint8Array(28+e.length);b.set(s);b.set(n,16);b.set(e,28);let x='';b.forEach(c=>x+=String.fromCharCode(c));return btoa(x);}async function decB64(b64,p){const r=atob(b64);const b=new Uint8Array(r.length);for(let i=0;i<r.length;i++)b[i]=r.charCodeAt(i);const k=await _ckey(p,b.slice(0,16));const d=await crypto.subtle.decrypt({name:'AES-GCM',iv:b.slice(16,28)},k,b.slice(28));return JSON.parse(new TextDecoder().decode(d));}function _cpass(){return sessionStorage.getItem('pass')||'';}async function cloudGet(k){try{const r=await fetch(SUPA_URL+'/rest/v1/app_data?select=v&k=eq.'+encodeURIComponent(k),{headers:SUPA_H});if(!r.ok)return null;const a=await r.json();if(!a[0])return null;return await decB64(a[0].v,_cpass());}catch(e){return null;}}async function cloudSet(k,o){try{const v=await encB64(o,_cpass());const r=await fetch(SUPA_URL+'/rest/v1/app_data',{method:'POST',headers:Object.assign({},SUPA_H,{Prefer:'resolution=merge-duplicates'}),body:JSON.stringify([{k:k,v:v,updated_at:new Date().toISOString()}])});return r.ok;}catch(e){return false;}}
-const RPT_SVG='<svg viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><line x1="6" y1="10" x2="12.5" y2="10" stroke="currentColor" stroke-width="1.5"/><line x1="6" y1="13.5" x2="10" y2="13.5" stroke="currentColor" stroke-width="1.5"/><path d="M14.5 9.5l4 4m0-4l-4 4" stroke="#ef4444" stroke-width="1.9" stroke-linecap="round"/></svg>';const RPT_KEY='reports_ruwais';async function report(p){let a=[];try{a=JSON.parse(localStorage.getItem(RPT_KEY)||'[]')}catch(e){}try{const c=await cloudGet(RPT_KEY);if(Array.isArray(c))a=c;}catch(e){}const id=(p.id||'')+'_'+(p.resv||'');if(!a.some(r=>r._id===id))a.unshift({_id:id,name:p.name,resv:p.resv||'',bus:p.bus||'',mina:p.mina||'',phone:p.phone||'',resolved:false,ts:Date.now()});localStorage.setItem(RPT_KEY,JSON.stringify(a));try{await cloudSet(RPT_KEY,a);}catch(e){}location.href='ruwais-reports.html';}
-function makeCardUrl(p){const grp=byResv[p.resv]||[p];const main={name:p.name,mina:p.mina||'',main:true};const rest=grp.filter(m=>m.name!==p.name).map(m=>({name:m.name,mina:m.mina||''}));const group=[main,...rest];let bin='';new TextEncoder().encode(JSON.stringify(group)).forEach(b=>bin+=String.fromCharCode(b));const g=btoa(bin);return 'https://abuesim.github.io/hajj-search/ruwais-card.html?b='+encodeURIComponent(p.bus||'')+'&g='+encodeURIComponent(g);}
-function showQRModal(i){const p=searchResults[i];if(!p)return;const u=makeCardUrl(p);document.getElementById('qrModalName').textContent=p.name;document.getElementById('qrImg').src='https://api.qrserver.com/v1/create-qr-code/?size=220x220&color=2b3039&bgcolor=ffffff&qzone=2&data='+encodeURIComponent(u);document.getElementById('qrModal').style.display='flex';}
-function closeQR(){document.getElementById('qrModal').style.display='none';}
-function onDataReady(d){
-  DATA=d;
-  DATA.forEach(p=>{
-    if(p.id)(byId[p.id]=byId[p.id]||[]).push(p);
-    if(p.phone)(byPhone[p.phone]=byPhone[p.phone]||[]).push(p);
-    if(p.resv)(byResv[p.resv]=byResv[p.resv]||[]).push(p);
-  });
-  const offices=[...new Set(d.map(p=>p.office||'').filter(Boolean))].sort();
-  const sel=document.getElementById('fOffice');
-  offices.forEach(o=>{const op=document.createElement('option');op.value=o;op.textContent=o;sel.appendChild(op);});
+let DATA=[];const byId={},byResv={};
+let h5=null,scanning=false;
+function setHint(t){const e=document.getElementById('scanHint');if(e)e.innerHTML=t;}
+function startScan(){
+  document.getElementById('result').innerHTML='';
+  document.getElementById('scanWrap').style.display='block';
+  setHint('📷 وجّه الكاميرا على باركود الهوية');
+  if(typeof Html5Qrcode==='undefined'){setHint('⚠️ تعذّر تحميل أداة المسح');return;}
+  if(!h5)h5=new Html5Qrcode("reader");
+  if(scanning)return;
+  h5.start({facingMode:"environment"},{fps:10,qrbox:{width:240,height:240}},onScan,()=>{})
+    .then(()=>{scanning=true;})
+    .catch(e=>{setHint('⚠️ تعذّر تشغيل الكاميرا.<br>تأكد من السماح بالوصول للكاميرا، وأن الموقع يفتح عبر https.<br><small>'+e+'</small>');});
 }
-const input=document.getElementById('searchInput');
-const clearBtn=document.getElementById('clearBtn');
-const resultsDiv=document.getElementById('results');
-let deb;
-input.addEventListener('input',()=>{clearTimeout(deb);deb=setTimeout(doSearch,200);clearBtn.classList.toggle('visible',input.value.length>0)});
-function clearSearch(){input.value='';clearBtn.classList.remove('visible');doSearch();input.focus()}
-function norm(s){return(s||'').replace(/[أإآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').toLowerCase().trim()}
-function getFilters(){return{bus:(document.getElementById('fBus').value||'').trim(),office:(document.getElementById('fOffice').value||''),gender:_fGender};}
-function hasFilters(){const f=getFilters();return!!(f.bus||f.office||f.gender);}
-function applyFilters(arr){
-  const f=getFilters();
-  return arr.filter(p=>{
-    if(f.bus&&p.bus!==f.bus)return false;
-    if(f.office&&(p.office||'')!==f.office)return false;
-    if(f.gender&&(p.gender||'')!==f.gender)return false;
-    return true;
-  });
-}
-function updateAdvBadge(){
-  const f=getFilters();const n=[f.bus,f.office,f.gender].filter(Boolean).length;
-  const b=document.getElementById('advBadge');b.style.display=n?'inline-block':'none';b.textContent=n;
-  document.getElementById('advToggle').classList.toggle('active',n>0);
-}
-function setGender(v){
-  _fGender=v;
-  ['gAll','gM','gF'].forEach(id=>document.getElementById(id).classList.remove('active'));
-  document.getElementById(v===''?'gAll':v==='ذكر'?'gM':'gF').classList.add('active');
-  updateAdvBadge();doSearch();
-}
-function toggleAdv(){const p=document.getElementById('advPanel');p.classList.toggle('open');}
-function clearAdv(){document.getElementById('fBus').value='';document.getElementById('fOffice').value='';setGender('');updateAdvBadge();doSearch();}
-function doSearch(){
-  updateAdvBadge();
-  const q=input.value.trim();
-  const filters=hasFilters();
-  if(!q&&!filters){showEmpty();return}
-  if(q.length===1&&!filters){resultsDiv.innerHTML='<div class="state-msg"><span class="icon">✍️</span><p>اكتب أكثر...</p></div>';return}
-  let m=[];
-  if(q){
-    if(byId[q])m=[...byId[q]];
-    if(!m.length&&byPhone[q])m=[...byPhone[q]];
-    if(!m.length){const alt=q.startsWith('0')?q.slice(1):'0'+q;if(byPhone[alt])m=[...byPhone[alt]]}
-    if(!m.length){const nq=norm(q);m=DATA.filter(p=>norm(p.name).includes(nq))}
-    if(!m.length&&/^\d+$/.test(q))m=DATA.filter(p=>p.id.includes(q));
-  }else{m=[...DATA];}
-  if(filters)m=applyFilters(m);
-  const seen=new Set();m=m.filter(p=>{const k=p.name+p.resv;if(seen.has(k))return false;seen.add(k);return true});
-  if(!m.length){resultsDiv.innerHTML=`<div class="no-result"><span class="icon">😔</span><p>${q?'لا نتائج لـ "<strong>'+q+'</strong>"':'لا نتائج للفلاتر المحددة'}</p><small>تأكد من البيانات المدخلة</small></div>`;return}
-  let html='';
-  if(m.length>1)html+=`<div style="text-align:center;margin-bottom:12px"><span class="count-badge">تم العثور على <strong>${m.length}</strong> نتيجة</span></div>`;
-  searchResults=m.slice(0,30);
-  searchResults.forEach((p,i)=>{
-    const grp=byResv[p.resv]||[];
-    const minaBox=p.mina?`<div class="info-box mina"><span class="label">سكن منى</span><span class="value" style="font-size:1.05rem">${p.mina}</span></div>`:'';
-    const waBtn=p.phone?`<a class="wa-ic wa-card" href="${waLink(p.phone)}" target="_blank" rel="noopener" title="مراسلة واتساب">${WA_SVG}</a>`:'';
-    html+=`<div class="result-card"><div class="card-header" style="display:flex;align-items:flex-start;justify-content:space-between"><div><div class="pilgrim-label">الحاج / الحاجة</div><div class="pilgrim-name">${p.name}</div></div><div style="display:flex;gap:6px"><button class="rpt-btn-ic" onclick="report(searchResults[${i}])" title="بلاغ">${RPT_SVG}</button><button class="qr-btn" onclick="showQRModal(${i})">📱</button></div></div><div class="card-body"><div class="info-box"><span class="label">رقم الحجز</span><span class="value" style="font-size:1.15rem">${p.resv||'—'}</span></div><div class="info-box bus"><span class="label">الباص</span><span class="value">${p.bus||'—'}</span></div>${minaBox}${waBtn}</div>`;
-    if(grp.length>1){
-      html+=`<div class="group-banner"><span>👥</span> رفقاء الحجز · ${grp.length} أشخاص</div><div class="group-list">`;
-      grp.forEach((mem,i)=>{const s=mem.name===p.name;const md=JSON.stringify(mem).replace(/'/g,'&#39;');html+=`<div class="group-member${s?' is-self':''}"><div class="member-num${s?' self':''}">${i+1}</div><div class="member-name">${mem.name}</div>${mem.mina?`<span class="member-mina">${mem.mina}</span>`:''}${mem.phone?`<a class="wa-ic wa-mini" href="${waLink(mem.phone)}" target="_blank" rel="noopener" title="مراسلة واتساب">${WA_SVG}</a>`:''}<button class="rpt-mini" onclick='report(${md})' title="بلاغ">${RPT_SVG}</button>${s?'<span class="you-badge">أنت</span>':''}</div>`});
-      html+='</div>';
-    }
-    html+='</div>';
-  });
-  if(m.length>30)html+=`<p style="text-align:center;color:rgba(255,255,255,.6);font-size:.85rem">يُعرض أول 30 نتيجة من ${m.length}</p>`;
-  resultsDiv.innerHTML=html;
-}
-function showEmpty(){resultsDiv.innerHTML='<div class="state-msg"><span class="icon">🔍</span><p>ابحث عن الحاج للعثور على معلومات الحجز والباص</p></div>'}
-// ── Inline barcode scan ──
-let _h5=null,_scanning=false;
-function openScan(){
-  document.getElementById('scanModal').classList.add('open');
-  if(typeof Html5Qrcode==='undefined'){document.getElementById('scanHint').innerHTML='⚠️ تعذّر تحميل أداة المسح';return;}
-  if(!_h5)_h5=new Html5Qrcode('scanReader');
-  if(_scanning)return;
-  _h5.start({facingMode:'environment'},{fps:10,qrbox:{width:240,height:180}},_onScan,()=>{})
-    .then(()=>{_scanning=true;})
-    .catch(e=>{document.getElementById('scanHint').innerHTML='⚠️ يحتاج إذن الكاميرا. تأكد من السماح وأن الرابط https<br><small>'+e+'</small>';});
-}
-function closeScan(){
-  document.getElementById('scanModal').classList.remove('open');
-  if(_h5&&_scanning){_h5.stop().catch(()=>{});_scanning=false;}
-}
-function _findId(t){
-  if(byId[t])return t;
-  const d=(t||'').replace(/\D/g,'');
-  if(byId[d])return d;
-  const m=(t||'').match(/\d{10}/);
-  if(m&&byId[m[0]])return m[0];
-  return d;
-}
-function _onScan(t){
-  const id=_findId(t);
-  const hits=byId[id];
-  if(!hits||!hits.length){document.getElementById('scanHint').innerHTML='❌ غير مسجّل: '+id+'<br><small>حاول مرة أخرى</small>';return;}
+async function stopScan(){if(h5&&scanning){try{await h5.stop();}catch(e){}scanning=false;}}
+function findId(t){if(byId[t])return t;const d=(t||'').replace(/\D/g,'');if(byId[d])return d;const m=(t||'').match(/\d{10}/);if(m&&byId[m[0]])return m[0];return d;}
+function onScan(t){
+  const id=findId(t);const m=byId[id];
+  if(!m||!m.length){setHint('❌ غير مسجّل: '+id+'<br>حاول مرة أخرى');return;}
   if(navigator.vibrate)navigator.vibrate(90);
-  closeScan();
-  input.value=id;
-  clearBtn.classList.add('visible');
-  doSearch();
+  stopScan();document.getElementById('scanWrap').style.display='none';showResult(m[0]);
 }
+function showResult(p){
+  const grp=byResv[p.resv]||[p];
+  const mina=p.mina?`<div class="info-box mina"><span class="label">سكن منى</span><span class="value">${p.mina}</span></div>`:'';
+  let h=`<div class="result-card"><div class="card-header"><div class="pilgrim-label">الحاج / الحاجة</div><div class="pilgrim-name">${p.name}</div></div><div class="card-body"><div class="info-box"><span class="label">رقم الحجز</span><span class="value" style="font-size:1.1rem">${p.resv||'—'}</span></div><div class="info-box bus"><span class="label">الباص</span><span class="value">${p.bus||'—'}</span></div>${mina}</div>`;
+  if(grp.length>1){
+    h+=`<div class="group-banner">👥 رفقاء الحجز · ${grp.length} أشخاص</div><div class="group-list">`;
+    grp.forEach((mem,i)=>{const s=mem.name===p.name;h+=`<div class="group-member" style="${s?'background:#f2f4f7':''}"><div class="member-num">${i+1}</div><div class="member-name">${mem.name}${s?' <b style="color:#4a525e">(أنت)</b>':''}</div>${mem.mina?`<span class="member-mina">${mem.mina}</span>`:''}${mem.phone?`<a class="wa-ic" href="${waLink(mem.phone)}" target="_blank" rel="noopener">${WA_SVG}</a>`:''}</div>`;});
+    h+='</div>';
+  }
+  h+='</div><button class="rescan-btn" onclick="startScan()">📷 مسح باركود جديد</button>';
+  document.getElementById('result').innerHTML=h;
+}
+function onDataReady(d){DATA=d;d.forEach(p=>{if(p.id)(byId[p.id]=byId[p.id]||[]).push(p);if(p.resv)(byResv[p.resv]=byResv[p.resv]||[]).push(p);});startScan();}
 initAuth();
 </script>
 <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}</script>
