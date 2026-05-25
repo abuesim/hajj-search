@@ -11,34 +11,41 @@ echo "║   تحديث بيانات حجاج يسر مساند  ║"
 echo "╚════════════════════════════════╝"
 echo ""
 
-# ── 1. تحقق من ملفات CSV ──
-CSV_M="/Users/m/Downloads/المحيميد 01.CSV"
-CSV_R="/Users/m/Downloads/الرويس 01.CSV"
+# ── 1. ابحث عن آخر ملف CSV في Downloads ──
+CSV_M=$(ls -t "/Users/m/Downloads/المحيميد"*.CSV 2>/dev/null | head -1)
+CSV_R=$(ls -t "/Users/m/Downloads/الرويس"*.CSV 2>/dev/null | head -1)
 
-if [ ! -f "$CSV_M" ]; then
-  echo "❌ ملف المحيميد غير موجود:"
-  echo "   $CSV_M"
-  echo ""
-  echo "   ضع الملف في Downloads باسم:  المحيميد 01.CSV"
-  echo "   ثم شغّل السكريبت مجدداً"
+if [ -z "$CSV_M" ]; then
+  echo "❌ ما في ملف المحيميد في Downloads"
+  echo "   المطلوب: المحيميد 01.CSV (أو 02 أو 03...)"
   read -p "اضغط Enter للخروج..."
   exit 1
 fi
 
-if [ ! -f "$CSV_R" ]; then
-  echo "❌ ملف الرويس غير موجود:"
-  echo "   $CSV_R"
-  echo ""
-  echo "   ضع الملف في Downloads باسم:  الرويس 01.CSV"
-  echo "   ثم شغّل السكريبت مجدداً"
+if [ -z "$CSV_R" ]; then
+  echo "❌ ما في ملف الرويس في Downloads"
+  echo "   المطلوب: الرويس 01.CSV (أو 02 أو 03...)"
   read -p "اضغط Enter للخروج..."
   exit 1
 fi
 
-echo "✅ ملفات CSV موجودة"
+echo "✅ المحيميد: $(basename "$CSV_M")"
+echo "✅ الرويس:   $(basename "$CSV_R")"
 echo ""
 
-# ── 2. تحليل البيانات ──
+# ── 2. حدّث مسارات parse_csv.py ──
+python3 - <<PYEOF
+import re
+txt = open('parse_csv.py', encoding='utf-8').read()
+txt = re.sub(r"'csv': '/Users/m/Downloads/المحيميد[^']*'",
+             f"'csv': '${CSV_M}'", txt)
+txt = re.sub(r"'csv': '/Users/m/Downloads/الرويس[^']*'",
+             f"'csv': '${CSV_R}'", txt)
+open('parse_csv.py', 'w', encoding='utf-8').write(txt)
+print("✅ parse_csv.py محدّث")
+PYEOF
+
+# ── 3. تحليل البيانات ──
 echo "⏳ جاري قراءة البيانات..."
 python3 parse_csv.py
 if [ $? -ne 0 ]; then
@@ -48,7 +55,7 @@ if [ $? -ne 0 ]; then
 fi
 echo ""
 
-# ── 3. بناء الصفحات ──
+# ── 4. بناء الصفحات ──
 echo "⏳ جاري بناء الصفحات..."
 python3 build_all.py
 if [ $? -ne 0 ]; then
@@ -58,9 +65,12 @@ if [ $? -ne 0 ]; then
 fi
 echo ""
 
-# ── 4. رفع إلى GitHub ──
+# ── 5. رفع إلى GitHub ──
 echo "⏳ جاري الرفع إلى GitHub..."
 DATE=$(date '+%Y-%m-%d %H:%M')
+M_NAME=$(basename "$CSV_M" .CSV)
+R_NAME=$(basename "$CSV_R" .CSV)
+
 git add pilgrims_data.json ruwais_data.json \
         muhaimeed.html manifest.html \
         ruwais.html ruwais-manifest.html \
@@ -69,11 +79,11 @@ git add pilgrims_data.json ruwais_data.json \
         dashboard.html ruwais-dashboard.html \
         card.html ruwais-card.html \
         app-m.webmanifest app-r.webmanifest \
-        sw.js hajj_site.zip 2>/dev/null
+        sw.js hajj_site.zip parse_csv.py 2>/dev/null
 
-git commit -m "تحديث البيانات — $DATE"
+git commit -m "تحديث البيانات — $M_NAME + $R_NAME — $DATE"
 if [ $? -ne 0 ]; then
-  echo "⚠️  لا يوجد تغييرات جديدة للرفع"
+  echo "⚠️  لا يوجد تغييرات جديدة"
   read -p "اضغط Enter للخروج..."
   exit 0
 fi
