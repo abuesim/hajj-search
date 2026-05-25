@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>البلاغات</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:linear-gradient(135deg,#0d4f3c 0%,#1a7a5e 50%,#0d4f3c 100%);min-height:100vh;padding:0 0 40px}
+  header{background:rgba(0,0,0,.25);padding:16px;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.1)}
+  .campaign-switch{display:flex;gap:8px;margin-bottom:12px}.camp-btn{flex:1;text-align:center;padding:9px 10px;border-radius:10px;font-size:.85rem;font-weight:700;text-decoration:none;border:1.5px solid rgba(245,208,110,.45);color:#f5d06e;background:rgba(255,255,255,.08);transition:.15s}.camp-btn.active{background:#f5d06e;color:#0d4f3c;border-color:#f5d06e}.camp-btn:active{transform:scale(.97)}
+  .hdr-row{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
+  header h1{color:#f5d06e;font-size:1.15rem;font-weight:700}
+  .nav-link{background:rgba(255,255,255,.15);color:#f5d06e;border-radius:10px;padding:6px 11px;font-size:.78rem;font-weight:700;text-decoration:none;border:1px solid rgba(245,208,110,.3)}
+  .summary{text-align:center;color:rgba(255,255,255,.85);font-size:.88rem;margin:14px 0 4px}
+  .summary b{color:#f5d06e}
+  #list{padding:12px 16px;max-width:600px;margin:0 auto}
+  .rpt-card{background:white;border-radius:16px;box-shadow:0 4px 18px rgba(0,0,0,.18);margin-bottom:14px;overflow:hidden;border-right:5px solid #e07b00;animation:fadeUp .2s ease}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  .rpt-card.done{border-right-color:#22c55e;opacity:.72}
+  .rpt-top{padding:14px 16px 10px}
+  .rpt-name{font-size:1.05rem;font-weight:700;color:#0d4f3c;margin-bottom:7px}
+  .rpt-card.done .rpt-name{text-decoration:line-through;color:#888}
+  .rpt-meta{display:flex;flex-wrap:wrap;gap:6px}
+  .rpt-chip{font-size:.72rem;background:#f0f4f0;color:#444;border-radius:6px;padding:3px 8px;font-weight:600;direction:ltr}
+  .rpt-bar{display:flex;gap:8px;padding:10px 12px;background:#fafafa;border-top:1px solid #eee}
+  .rpt-btn{border:none;border-radius:9px;padding:9px;font-size:.82rem;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:5px}
+  .b-resolve{flex:1;background:#dcfce7;color:#15803d}
+  .rpt-card.done .b-resolve{background:#22c55e;color:#fff}
+  .b-wa{background:#25D366;width:46px}
+  .b-wa svg{width:20px;height:20px;fill:#fff}
+  .b-del{background:#fee2e2;color:#dc2626;width:46px;font-size:1rem}
+  .empty{text-align:center;color:rgba(255,255,255,.7);margin-top:70px}
+  .empty .icon{font-size:3.2rem;display:block;margin-bottom:10px}
+</style>
+</head>
+<body>
+<header>
+  <div class="campaign-switch"><a href="muhaimeed.html" class="camp-btn active">شركة المحيميد</a><a href="ruwais.html" class="camp-btn ">شركة الرويس</a></div>
+  <div class="hdr-row">
+    <h1>🚩 البلاغات</h1>
+    <a href="muhaimeed.html" class="nav-link">🔍 بحث الحجاج</a>
+  </div>
+</header>
+<div class="summary" id="summary"></div>
+<div id="list"></div>
+<script>
+const SUPA_URL='https://crpcgsznwqrphgfapthw.supabase.co';const SUPA_KEY='sb_publishable_6l1ngkrRbe6UwQjiaj5O3Q_hLa4QCjG';const SUPA_H={apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY,'Content-Type':'application/json'};async function _ckey(p,salt){const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(p),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:100000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);}async function encB64(o,p){const s=crypto.getRandomValues(new Uint8Array(16)),n=crypto.getRandomValues(new Uint8Array(12));const k=await _ckey(p,s);const e=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv:n},k,new TextEncoder().encode(JSON.stringify(o))));const b=new Uint8Array(28+e.length);b.set(s);b.set(n,16);b.set(e,28);let x='';b.forEach(c=>x+=String.fromCharCode(c));return btoa(x);}async function decB64(b64,p){const r=atob(b64);const b=new Uint8Array(r.length);for(let i=0;i<r.length;i++)b[i]=r.charCodeAt(i);const k=await _ckey(p,b.slice(0,16));const d=await crypto.subtle.decrypt({name:'AES-GCM',iv:b.slice(16,28)},k,b.slice(28));return JSON.parse(new TextDecoder().decode(d));}function _cpass(){return sessionStorage.getItem('pass')||'';}async function cloudGet(k){try{const r=await fetch(SUPA_URL+'/rest/v1/app_data?select=v&k=eq.'+encodeURIComponent(k),{headers:SUPA_H});if(!r.ok)return null;const a=await r.json();if(!a[0])return null;return await decB64(a[0].v,_cpass());}catch(e){return null;}}async function cloudSet(k,o){try{const v=await encB64(o,_cpass());const r=await fetch(SUPA_URL+'/rest/v1/app_data',{method:'POST',headers:Object.assign({},SUPA_H,{Prefer:'resolution=merge-duplicates'}),body:JSON.stringify([{k:k,v:v,updated_at:new Date().toISOString()}])});return r.ok;}catch(e){return false;}}
+const WA_SVG='<svg viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38c1.45.79 3.08 1.21 4.79 1.21h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm5.8 14.04c-.24.68-1.42 1.31-1.96 1.39-.5.07-1.13.1-1.83-.11-.42-.13-.96-.31-1.65-.61-2.9-1.25-4.8-4.17-4.95-4.36-.14-.19-1.18-1.57-1.18-2.99s.75-2.12 1.01-2.41c.26-.29.57-.36.76-.36.19 0 .38 0 .54.01.18.01.41-.07.64.49.24.57.81 1.97.88 2.11.07.14.12.31.02.5-.09.19-.14.31-.28.47-.14.17-.29.37-.42.5-.14.14-.28.29-.12.56.17.28.74 1.22 1.59 1.98 1.1.97 2.02 1.27 2.3 1.42.28.14.45.12.61-.07.17-.19.7-.82.89-1.1.18-.28.37-.23.61-.14.25.09 1.57.74 1.84.88.27.14.45.2.51.31.07.11.07.63-.17 1.31z"/></svg>';function waLink(ph){let n=(ph||'').replace(/\D/g,'');if(!n)return'';if(n[0]==='0')n=n.slice(1);if(n.indexOf('966')!==0)n='966'+n;return'https://wa.me/'+n;}
+const RPT_KEY='reports_muhaimeed';
+let _reports=[];
+function _local(){try{return JSON.parse(localStorage.getItem(RPT_KEY)||'[]')}catch(e){return[]}}
+function _saveLocal(a){localStorage.setItem(RPT_KEY,JSON.stringify(a))}
+async function _persist(){_saveLocal(_reports);try{await cloudSet(RPT_KEY,_reports)}catch(e){}}
+function toggle(id){const r=_reports.find(x=>x._id===id);if(r)r.resolved=!r.resolved;_persist();render()}
+function del(id){if(!confirm('حذف البلاغ؟'))return;_reports=_reports.filter(x=>x._id!==id);_persist();render()}
+function render(){
+  const a=_reports;const done=a.filter(r=>r.resolved).length;
+  document.getElementById('summary').innerHTML=a.length?`<b>${a.length}</b> بلاغ · <b>${done}</b> تم حلها`:'';
+  const l=document.getElementById('list');
+  if(!a.length){l.innerHTML='<div class="empty"><span class="icon">✅</span><p>لا توجد بلاغات</p></div>';return}
+  l.innerHTML=a.map(r=>`<div class="rpt-card${r.resolved?' done':''}">
+    <div class="rpt-top"><div class="rpt-name">${r.name}</div>
+      <div class="rpt-meta">${r.resv?`<span class="rpt-chip">حجز ${r.resv}</span>`:''}${r.bus?`<span class="rpt-chip">باص ${r.bus}</span>`:''}${r.mina?`<span class="rpt-chip">سكن ${r.mina}</span>`:''}</div>
+    </div>
+    <div class="rpt-bar">
+      <button class="rpt-btn b-resolve" onclick="toggle('${r._id}')">${r.resolved?'✓ تم الحل':'وضع كمحلول'}</button>
+      ${r.phone?`<a class="rpt-btn b-wa" href="${waLink(r.phone)}" target="_blank" rel="noopener">${WA_SVG}</a>`:''}
+      <button class="rpt-btn b-del" onclick="del('${r._id}')">🗑</button>
+    </div>
+  </div>`).join('');
+}
+async function init(){
+  if(sessionStorage.getItem('auth')!=='1'){location.href='muhaimeed.html';return;}
+  _reports=_local();render();
+  const c=await cloudGet(RPT_KEY);if(Array.isArray(c)){_reports=c;_saveLocal(c);render();}
+}
+init();
+</script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}</script>
+</body>
+</html>
