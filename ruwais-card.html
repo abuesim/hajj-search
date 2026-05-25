@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>بطاقة ركاب</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:linear-gradient(135deg,#2b3039,#4a525e);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+  .card{background:white;border-radius:24px;overflow:hidden;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+  .card-top{background:linear-gradient(135deg,#4a525e,#2b3039);padding:20px 24px;text-align:center}
+  .co{color:rgba(255,255,255,.65);font-size:.72rem;letter-spacing:1px;margin-bottom:8px}
+  .bus-lbl{color:rgba(255,255,255,.6);font-size:.68rem;margin-bottom:2px}
+  .bus-num{color:#f5d06e;font-size:2.8rem;font-weight:800;line-height:1.1}
+  .main-sec{padding:16px 20px 14px;background:#f7f8fa;border-bottom:2px solid #e4e7ec}
+  .main-lbl{font-size:.64rem;color:#888;font-weight:600;letter-spacing:.5px;margin-bottom:4px}
+  .main-name{font-size:1.2rem;font-weight:700;color:#2b3039;line-height:1.4;margin-bottom:8px}
+  .main-mina{display:inline-flex;align-items:center;gap:6px;background:#e8f4ff;border-radius:8px;padding:5px 12px}
+  .mina-lbl{font-size:.65rem;color:#666;font-weight:600}
+  .mina-val{font-size:.95rem;font-weight:800;color:#1a4a7a;direction:ltr}
+  .comp-sec{padding:10px 18px 14px}
+  .sec-title{font-size:.66rem;color:#aaa;font-weight:600;letter-spacing:.5px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0f0f0}
+  .mrow{display:flex;align-items:center;gap:10px;padding:7px 2px;border-bottom:1px solid #f5f5f5}
+  .mrow:last-child{border-bottom:none}
+  .mnum{width:22px;height:22px;border-radius:50%;background:#4a525e;color:white;font-size:.7rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .mname{font-size:.88rem;color:#333;font-weight:500;flex:1;line-height:1.3}
+  .mmina{font-size:.74rem;color:#1a4a7a;font-weight:700;background:#eef4ff;border-radius:5px;padding:2px 7px;direction:ltr;flex-shrink:0;white-space:nowrap}
+  .foot{background:#f7f7f7;padding:9px 20px;text-align:center;border-top:1px solid #eee;font-size:.62rem;color:#bbb}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="card-top">
+    <div class="co">🕋 حملة الرويس</div>
+    <div class="bus-lbl">الباص</div>
+    <div class="bus-num" id="cbus">—</div>
+  </div>
+  <div class="main-sec">
+    <div class="main-lbl">الحاج / الحاجة</div>
+    <div class="main-name" id="mainName">—</div>
+    <div class="main-mina" id="mainMinaBox">
+      <span class="mina-lbl">سكن منى</span>
+      <span class="mina-val" id="mainMina">—</span>
+    </div>
+  </div>
+  <div class="comp-sec" id="compSec">
+    <div class="sec-title">المرافقون · سكن منى</div>
+    <div id="compList"></div>
+  </div>
+  <div class="foot">حملة الرويس للحج والعمرة</div>
+</div>
+<script>
+  const p=new URLSearchParams(location.search);
+  document.getElementById('cbus').textContent=p.get('b')||'—';
+  const gRaw=p.get('g');
+  if(gRaw){
+    try{
+      const bytes=Uint8Array.from(atob(gRaw),c=>c.charCodeAt(0));
+      const group=JSON.parse(new TextDecoder().decode(bytes));
+      const main=group[0];
+      document.getElementById('mainName').textContent=main.name||'—';
+      if(main.mina){document.getElementById('mainMina').textContent=main.mina;}
+      else{document.getElementById('mainMinaBox').style.display='none';}
+      const companions=group.slice(1);
+      if(companions.length>0){
+        const list=document.getElementById('compList');
+        companions.forEach((m,i)=>{
+          const row=document.createElement('div');
+          row.className='mrow';
+          row.innerHTML='<span class="mnum">'+(i+1)+'</span><span class="mname">'+m.name+'</span>'+(m.mina?'<span class="mmina">'+m.mina+'</span>':'');
+          list.appendChild(row);
+        });
+      } else {
+        document.getElementById('compSec').style.display='none';
+      }
+    }catch(e){document.getElementById('mainName').textContent='خطأ في تحميل البيانات';}
+  }
+</script>
+</body>
+</html>

@@ -5,7 +5,10 @@
 *.psd
 *.pdf
 pilgrims_data.json
+ruwais_data.json
+*_data.json
 .claude/
 .DS_Store
 hajj_site/
 _preview_test.html
+_rv_test.html
