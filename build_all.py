@@ -10,8 +10,9 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 BASE = '/Users/m/Documents/est3lam'
 import re, subprocess, sys
 import gen_manifest
-PASSWORD_SEARCH   = b'112233'   # same for all campaigns
+PASSWORD_SEARCH   = b'112233'
 PASSWORD_MANIFEST = b'111222'
+PASSWORD_DASH     = b'999000'
 
 def make_payload(data_bytes, password):
     salt  = os.urandom(16)
@@ -1038,6 +1039,7 @@ for c in CAMPAIGNS:
     data_bytes = load_data_bytes(c['data'])
     ps = make_payload(data_bytes, PASSWORD_SEARCH)
     pm = make_payload(data_bytes, PASSWORD_MANIFEST)
+    pd = make_payload(data_bytes, PASSWORD_DASH)
     _lh = LOCK_HTML.replace('<h2>يسر مساند</h2>', f"<h2>{c['brand']}</h2>")
     LH_SEARCH   = _lh.replace('__PAGETYPE__', 'البحث عن الحجاج')
     LH_MANIFEST = _lh.replace('__PAGETYPE__', 'بيان الإركاب')
@@ -1060,7 +1062,7 @@ for c in CAMPAIGNS:
     scn = apply_theme(make_scan(make_decrypt_js(ps), LH_SCAN, switcher(c['key']), c['search_out']), c['theme'])
     open(f"{BASE}/{c['scan_out']}",'w',encoding='utf-8').write(addpwa(scn))
     # dashboard
-    dash = apply_theme(make_dashboard(make_decrypt_js(ps), LH_DASH, 'لوحة التحكم', c['search_out'], c['reports_out'], c['manifest_out'], switcher(c['key'])), c['theme'])
+    dash = apply_theme(make_dashboard(make_decrypt_js(pd), LH_DASH, 'لوحة التحكم', c['search_out'], c['reports_out'], c['manifest_out'], switcher(c['key'])), c['theme'])
     open(f"{BASE}/{c['dash_out']}",'w',encoding='utf-8').write(addpwa(dash))
     print(f"  {c['dash_out']}: built ({c['key']})")
     # manifest
