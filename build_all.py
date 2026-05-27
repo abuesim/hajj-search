@@ -1530,16 +1530,13 @@ function doExport(){{
   }});
   const safe=shortName(sv).replace(/\\s+/g,'_').replace(/[^\\u0600-\\u06FF\\w_]/g,'');
   const fname='حجاج_'+safe+'.vcf';
-  // File + Web Share API: يفتح Sheet المشاركة في iOS — يضيف للجهات مباشرة
-  const file=new File(["\\uFEFF"+vcf],fname,{{type:'text/vcard;charset=utf-8'}});
-  if(navigator.share&&navigator.canShare&&navigator.canShare({{files:[file]}})){{
-    navigator.share({{files:[file],title:'تصدير جهات الاتصال'}}).catch(()=>{{}});
-  }}else{{
-    // fallback: تنزيل تقليدي (للديسكتوب وأندرويد القديم)
-    const url=URL.createObjectURL(file);
-    const a=document.createElement('a');a.href=url;a.download=fname;document.body.appendChild(a);a.click();document.body.removeChild(a);
-    setTimeout(()=>URL.revokeObjectURL(url),1500);
-  }}
+  // تنزيل مباشر دائماً — يعمل على كل المنصات
+  const blob=new Blob([vcf],{{type:'text/vcard;charset=utf-8'}});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=fname;a.style.display='none';
+  document.body.appendChild(a);a.click();
+  setTimeout(()=>{{document.body.removeChild(a);URL.revokeObjectURL(url);}},1500);
 }}
 function norm(s){{return(s||'').replace(/[أإآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').toLowerCase().trim()}}
 
