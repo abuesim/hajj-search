@@ -7,7 +7,7 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
-BASE = '/Users/m/Documents/est3lam'
+BASE = '/Users/salehalskakir/Documents/hajj-search'
 import re, subprocess, sys
 import gen_manifest
 PASSWORD_SEARCH   = b'112233'
@@ -416,7 +416,7 @@ def make_index(DECRYPT_JS, LOCK_HTML, H1, NAV, QR, CARDFILE, SWITCHER, REPORTS_J
 <header>
   {SWITCHER}
   <div class="hdr-row">
-    <h1>🕋 {H1} <span style="font-size:.55em;opacity:.6;font-weight:400">v3.7</span></h1>
+    <h1>🕋 {H1} <span style="font-size:.55em;opacity:.6;font-weight:400">v3.8</span></h1>
     <div style="display:flex;gap:5px;flex-shrink:0">{'<a href="'+DASH_LINK+'" class="nav-link">📊 لوحة</a>' if DASH_LINK else ''}{'<a href="'+SUPV_LINK+'" class="nav-link">👥 مشرفين</a>' if SUPV_LINK else ''}<a href="{REPORTS_LINK}" class="nav-link">🚩 بلاغات</a><a href="{NAV}" class="nav-link">📋 بيانات</a></div>
   </div>
   <div class="search-wrap">
@@ -757,7 +757,7 @@ def make_scan(DECRYPT_JS, LOCK_HTML, SWITCHER, SEARCH_LINK):
 {LOCK_HTML}
 <header>
   {SWITCHER}
-  <div class="hdr-row"><h1>📷 البحث السريع <span style="font-size:.6em;opacity:.6;font-weight:400">v3.7</span></h1><a href="{SEARCH_LINK}" class="nav-link">🔍 بحث عادي</a></div>
+  <div class="hdr-row"><h1>📷 البحث السريع <span style="font-size:.6em;opacity:.6;font-weight:400">v3.8</span></h1><a href="{SEARCH_LINK}" class="nav-link">🔍 بحث عادي</a></div>
 </header>
 <div id="scanWrap"><div id="reader"></div><div id="scanHint">📷 وجّه الكاميرا على باركود الهوية</div></div>
 <div id="result"></div>
@@ -863,7 +863,7 @@ def make_dashboard(DECRYPT_JS, LOCK_HTML, H1, SEARCH_LINK, REPORTS_LINK, MANIFES
 <header>
   {SWITCHER}
   <div class="hdr-row">
-    <h1>📊 {H1} <span style="font-size:.6em;opacity:.6;font-weight:400">v3.7</span></h1>
+    <h1>📊 {H1} <span style="font-size:.6em;opacity:.6;font-weight:400">v3.8</span></h1>
     <div style="display:flex;gap:5px;flex-shrink:0">
       <a href="{SEARCH_LINK}" class="nav-link">🔍 بحث</a>
       <a href="{REPORTS_LINK}" class="nav-link">🚩 بلاغات</a>
@@ -1087,7 +1087,7 @@ def make_supervisors(DECRYPT_JS, LOCK_HTML, H1, SEARCH_LINK, SWITCHER):
 <header>
   {SWITCHER}
   <div class="hdr-row">
-    <h1>👥 {H1} <span style="font-size:.6em;opacity:.6;font-weight:400">v3.7</span></h1>
+    <h1>👥 {H1} <span style="font-size:.6em;opacity:.6;font-weight:400">v3.8</span></h1>
     <a href="{SEARCH_LINK}" class="nav-link">🔍 بحث</a>
   </div>
   <div class="mode-toggle">
@@ -1096,7 +1096,7 @@ def make_supervisors(DECRYPT_JS, LOCK_HTML, H1, SEARCH_LINK, SWITCHER):
     <button class="mode-btn" id="mExport" onclick="setMode('export')">📞 سحب الأرقام</button>
   </div>
   <div class="search-wrap">
-    <input type="search" id="searchInput" placeholder="ابحث باسم المشرف..." autocomplete="off" autocorrect="off" spellcheck="false">
+    <input type="search" id="searchInput" placeholder="ابحث باسم المشرف أو الغرفة أو الحاج..." autocomplete="off" autocorrect="off" spellcheck="false">
     <span class="search-icon">🔍</span>
   </div>
 </header>
@@ -1165,7 +1165,7 @@ function setMode(m){{
   document.getElementById('mSupv').classList.toggle('active',m==='supv');
   document.getElementById('mRoom').classList.toggle('active',m==='room');
   document.getElementById('mExport').classList.toggle('active',m==='export');
-  inp().placeholder=m==='supv'?'ابحث باسم المشرف...':m==='room'?'ابحث برقم الغرفة...':'ابحث في المشرفين...';
+  inp().placeholder='ابحث باسم المشرف أو الغرفة أو الحاج...';
   render('');
 }}
 
@@ -1177,8 +1177,17 @@ function render(q){{
   else renderExport(q,div);
 }}
 
+function supvMatches(sv,q){{
+  if(sv.includes(q))return true;
+  const info=bySupv[sv];
+  const rooms=Object.keys(info.rooms);
+  if(rooms.some(rm=>rm.includes(q)))return true;
+  for(const rm of rooms){{if(info.rooms[rm].some(p=>p.name&&p.name.includes(q)))return true;}}
+  return false;
+}}
+
 function renderSupv(q,div){{
-  const list=q?supvNames.filter(n=>n.includes(q)):supvNames;
+  const list=q?supvNames.filter(n=>supvMatches(n,q)):supvNames;
   if(!list.length){{div.innerHTML=NO_RES;return;}}
   let html=`<div class="count-info">${{list.length}} مشرف</div>`;
   list.forEach((sv,idx)=>{{
@@ -1240,7 +1249,13 @@ function floorOf(rm){{
 }}
 
 function renderRooms(q,div){{
-  const allRooms=Object.keys(byRoom).filter(r=>!q||r.includes(q));
+  const allRooms=Object.keys(byRoom).filter(r=>{{
+    if(!q)return true;
+    if(r.includes(q))return true;
+    const info=byRoom[r];
+    if(info.pilgrims.some(p=>(p.supervisor&&p.supervisor.includes(q))||(p.name&&p.name.includes(q))))return true;
+    return false;
+  }});
   allRooms.sort((a,b)=>{{const na=parseInt(a),nb=parseInt(b);return(isNaN(na)||isNaN(nb))?a.localeCompare(b):na-nb;}});
   if(!allRooms.length){{div.innerHTML=NO_RES;return;}}
   // group by floor
@@ -1530,13 +1545,20 @@ function doExport(){{
   }});
   const safe=shortName(sv).replace(/\\s+/g,'_').replace(/[^\\u0600-\\u06FF\\w_]/g,'');
   const fname='حجاج_'+safe+'.vcf';
-  // تنزيل مباشر دائماً — يعمل على كل المنصات
-  const blob=new Blob([vcf],{{type:'text/vcard;charset=utf-8'}});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;a.download=fname;a.style.display='none';
-  document.body.appendChild(a);a.click();
-  setTimeout(()=>{{document.body.removeChild(a);URL.revokeObjectURL(url);}},1500);
+  // iOS Safari لا يدعم a.download مع blob — نستخدم data URI بدلاً
+  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&'ontouchend' in document);
+  if(isIOS){{
+    const b64=btoa(unescape(encodeURIComponent(vcf)));
+    const dataUri='data:text/vcard;base64,'+b64;
+    window.open(dataUri,'_blank');
+  }}else{{
+    const blob=new Blob([vcf],{{type:'text/vcard;charset=utf-8'}});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download=fname;a.style.display='none';
+    document.body.appendChild(a);a.click();
+    setTimeout(()=>{{document.body.removeChild(a);URL.revokeObjectURL(url);}},1500);
+  }}
 }}
 function norm(s){{return(s||'').replace(/[أإآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').toLowerCase().trim()}}
 
@@ -1584,7 +1606,7 @@ def make_landing(campaigns):
         '.foot{margin-top:30px;color:rgba(255,255,255,.4);font-size:.72rem}'
         '</style></head><body>'
         '<div class="home-head"><span class="k">🕋</span><h1>حملات الحج</h1>'
-        '<div class="ver-badge">v3.7</div>'
+        '<div class="ver-badge">v3.8</div>'
         '<p>اختر الحملة والخدمة</p>'
         '<div class="upd-date">آخر تحديث للبيانات: '+__import__('datetime').datetime.now().strftime('%d/%m/%Y')+'</div>'
         '</div>'
