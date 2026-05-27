@@ -1506,12 +1506,19 @@ function doExport(){{
   }});
   if(!out.length){{alert('لا يوجد أرقام محددة');return;}}
   let vcf='';
+  // Sacrificial header card — iOS skips the first vCard; this label gets dropped instead
+  const hdrLabel='📋 47 | '+shortName(sv)+' ('+out.length+')';
+  vcf+='BEGIN:VCARD\\r\\n';
+  vcf+='VERSION:3.0\\r\\n';
+  vcf+='FN:'+hdrLabel+'\\r\\n';
+  vcf+='N:;'+hdrLabel+';;;\\r\\n';
+  vcf+='END:VCARD\\r\\n';
   out.forEach((c,i)=>{{
     const fn='47 | '+c.name;
     vcf+='BEGIN:VCARD\\r\\n';
     vcf+='VERSION:3.0\\r\\n';
     vcf+='FN:'+fn+'\\r\\n';
-    vcf+='N:'+fn+';;;;\\r\\n';
+    vcf+='N:;'+fn+';;;\\r\\n';
     vcf+='TEL;TYPE=CELL:'+c.phone+'\\r\\n';
     vcf+='END:VCARD\\r\\n';
   }});
