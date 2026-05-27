@@ -58,7 +58,8 @@
       const bytes=Uint8Array.from(atob(gRaw),c=>c.charCodeAt(0));
       const group=JSON.parse(new TextDecoder().decode(bytes));
       const main=group[0];
-      document.getElementById('csupv').textContent=main.supervisor||p.get('b')||'—';
+      const _sn=s=>{const p=(s||'').trim().split(/\s+/).filter(Boolean);return p.length<=2?(s||''):p[0]+' '+p[p.length-1];};
+      document.getElementById('csupv').textContent=_sn(main.supervisor)||p.get('b')||'—';
       document.getElementById('mainName').textContent=main.name||'—';
       if(main.mina){document.getElementById('mainMina').textContent=main.mina;}
       else{document.getElementById('mainMinaBox').style.display='none';}

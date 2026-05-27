@@ -475,6 +475,7 @@ let deb;
 input.addEventListener('input',()=>{{clearTimeout(deb);deb=setTimeout(doSearch,200);clearBtn.classList.toggle('visible',input.value.length>0)}});
 function clearSearch(){{input.value='';clearBtn.classList.remove('visible');doSearch();input.focus()}}
 function norm(s){{return(s||'').replace(/[أإآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').toLowerCase().trim()}}
+function shortName(n){{const p=(n||'').trim().split(/\s+/).filter(Boolean);return p.length<=2?(n||''):p[0]+' '+p[p.length-1];}}
 function doSearch(){{
   const q=input.value.trim();
   if(!q){{showEmpty();return}}
@@ -494,7 +495,7 @@ function doSearch(){{
     const grp=byResv[p.resv]||[];
     const minaBox=p.mina?`<div class="info-box mina"><span class="label">سكن منى</span><span class="value" style="font-size:1.05rem">${{p.mina}}</span></div>`:'';
     const waBtn=p.phone?`<a class="wa-ic wa-card" href="${{waLink(p.phone)}}" target="_blank" rel="noopener" title="مراسلة واتساب">${{WA_SVG}}</a>`:'';
-    html+=`<div class="result-card"><div class="card-header" style="display:flex;align-items:flex-start;justify-content:space-between"><div><div class="pilgrim-label">الحاج / الحاجة</div><div class="pilgrim-name">${{p.name}}</div></div><div style="display:flex;gap:6px"><button class="rpt-btn-ic" onclick="report(searchResults[${{i}}])" title="بلاغ">${{RPT_SVG}}</button><button class="qr-btn" onclick="showQRModal(${{i}})">📱</button></div></div><div class="card-body"><div class="info-box"><span class="label">رقم الحجز</span><span class="value" style="font-size:1.15rem">${{p.resv||'—'}}</span></div><div class="info-box supv"><span class="label">المشرف</span><span class="value">${{p.supervisor||'—'}}</span></div>${{minaBox}}${{waBtn}}</div>`;
+    html+=`<div class="result-card"><div class="card-header" style="display:flex;align-items:flex-start;justify-content:space-between"><div><div class="pilgrim-label">الحاج / الحاجة</div><div class="pilgrim-name">${{p.name}}</div></div><div style="display:flex;gap:6px"><button class="rpt-btn-ic" onclick="report(searchResults[${{i}}])" title="بلاغ">${{RPT_SVG}}</button><button class="qr-btn" onclick="showQRModal(${{i}})">📱</button></div></div><div class="card-body"><div class="info-box"><span class="label">رقم الحجز</span><span class="value" style="font-size:1.15rem">${{p.resv||'—'}}</span></div><div class="info-box supv"><span class="label">المشرف</span><span class="value">${{shortName(p.supervisor||'—')}}</span></div>${{minaBox}}${{waBtn}}</div>`;
     const othrs=grp.filter(m=>m.name!==p.name);
     if(othrs.length>0){{
       html+=`<div class="group-banner"><span>👥</span> رفقاء الحجز · ${{othrs.length}} أشخاص</div><div class="group-list">`;
@@ -519,7 +520,7 @@ function openScan(){{
   if(typeof Html5Qrcode==='undefined'){{document.getElementById('scanHint').innerHTML='⚠️ تعذّر تحميل أداة المسح';return;}}
   if(!_h5)_h5=new Html5Qrcode('scanReader');
   if(_scanning)return;
-  _h5.start({{facingMode:'environment'}},{{fps:10,qrbox:{{width:220,height:130}}}},_onScan,()=>{{}})
+  _h5.start({{facingMode:'environment'}},{{fps:10,qrbox:{{width:220,height:220}}}},_onScan,()=>{{}})
     .then(()=>{{_scanning=true;}})
     .catch(e=>{{document.getElementById('scanHint').innerHTML='⚠️ يحتاج إذن الكاميرا<br><small>'+e+'</small>';}});
 }}
@@ -647,7 +648,8 @@ CARD = """<!DOCTYPE html>
       const bytes=Uint8Array.from(atob(gRaw),c=>c.charCodeAt(0));
       const group=JSON.parse(new TextDecoder().decode(bytes));
       const main=group[0];
-      document.getElementById('csupv').textContent=main.supervisor||p.get('b')||'—';
+      const _sn=s=>{const p=(s||'').trim().split(/\s+/).filter(Boolean);return p.length<=2?(s||''):p[0]+' '+p[p.length-1];};
+      document.getElementById('csupv').textContent=_sn(main.supervisor)||p.get('b')||'—';
       document.getElementById('mainName').textContent=main.name||'—';
       if(main.mina){document.getElementById('mainMina').textContent=main.mina;}
       else{document.getElementById('mainMinaBox').style.display='none';}
@@ -758,7 +760,8 @@ function onScan(t){{
 function showResult(p){{
   const grp=byResv[p.resv]||[p];
   const mina=p.mina?`<div class="info-box mina"><span class="label">سكن منى</span><span class="value">${{p.mina}}</span></div>`:'';
-  let h=`<div class="result-card"><div class="card-header"><div class="pilgrim-label">الحاج / الحاجة</div><div class="pilgrim-name">${{p.name}}</div></div><div class="card-body"><div class="info-box"><span class="label">رقم الحجز</span><span class="value" style="font-size:1.1rem">${{p.resv||'—'}}</span></div><div class="info-box supv"><span class="label">المشرف</span><span class="value">${{p.supervisor||'—'}}</span></div>${{mina}}</div>`;
+  function shortName(n){{const p=(n||'').trim().split(/\s+/).filter(Boolean);return p.length<=2?(n||''):p[0]+' '+p[p.length-1];}}
+  let h=`<div class="result-card"><div class="card-header"><div class="pilgrim-label">الحاج / الحاجة</div><div class="pilgrim-name">${{p.name}}</div></div><div class="card-body"><div class="info-box"><span class="label">رقم الحجز</span><span class="value" style="font-size:1.1rem">${{p.resv||'—'}}</span></div><div class="info-box supv"><span class="label">المشرف</span><span class="value">${{shortName(p.supervisor||'—')}}</span></div>${{mina}}</div>`;
   const othrs=grp.filter(m=>m.name!==p.name);
   if(othrs.length>0){{
     h+=`<div class="group-banner">👥 رفقاء الحجز · ${{othrs.length}} أشخاص</div><div class="group-list">`;
@@ -1108,7 +1111,7 @@ function renderSupv(q,div){{
       <div class="supv-row" onclick="toggleSupv(${{idx}})">
         <div class="supv-avatar">${{sv.charAt(0)}}</div>
         <div class="supv-info">
-          <div class="supv-name">${{sv}}</div>
+          <div class="supv-name">${{shortName(sv)}}</div>
           <div class="supv-meta">${{info.total}} حاج &nbsp;·&nbsp; ${{roomKeys.length}} غرفة &nbsp;·&nbsp; <span style="color:#1a7a5e">♂${{info.male}}</span> <span style="color:#c0396e">♀${{info.female}}</span></div>
         </div>
         <div class="supv-arrow">${{isOpen?'▲':'▼'}}</div>
