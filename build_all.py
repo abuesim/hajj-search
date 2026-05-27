@@ -344,27 +344,8 @@ def make_index(DECRYPT_JS, LOCK_HTML, H1, NAV, QR, CARDFILE, SWITCHER, REPORTS_J
   .clear-btn{{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:#ddd;border:none;border-radius:50%;width:26px;height:26px;font-size:.85rem;cursor:pointer;display:none;align-items:center;justify-content:center;color:#666}}
   .clear-btn.visible{{display:flex}}
   .search-actions{{display:flex;gap:8px;margin-top:10px}}
-  .btn-scan{{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;background:#f5d06e;color:#0d4f3c;border:none;border-radius:12px;padding:12px 10px;font-size:.93rem;font-weight:800;cursor:pointer;font-family:inherit;transition:.15s}}
+  .btn-scan{{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;background:#f5d06e;color:#0d4f3c;border:none;border-radius:12px;padding:13px 10px;font-size:.95rem;font-weight:800;cursor:pointer;font-family:inherit;transition:.15s}}
   .btn-scan:active{{transform:scale(.97)}}
-  .btn-adv{{display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(255,255,255,.15);color:#f5d06e;border:1.5px solid rgba(245,208,110,.4);border-radius:12px;padding:12px 14px;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:.15s}}
-  .btn-adv.active{{background:#f5d06e;color:#0d4f3c;border-color:#f5d06e}}
-  .btn-adv:active{{transform:scale(.97)}}
-  .adv-panel{{display:none;background:rgba(0,0,0,.18);border-radius:14px;padding:14px;margin-top:10px;border:1px solid rgba(255,255,255,.1)}}
-  .adv-panel.open{{display:block;animation:fadeUp .18s ease}}
-  .adv-row{{display:flex;gap:8px;margin-bottom:10px;align-items:flex-end}}
-  .adv-row:last-child{{margin-bottom:0}}
-  .adv-field{{flex:1;display:flex;flex-direction:column;gap:4px}}
-  .adv-label{{color:rgba(255,255,255,.65);font-size:.72rem;font-weight:700}}
-  .adv-input{{padding:9px 12px;border-radius:10px;border:1.5px solid rgba(255,255,255,.2);background:rgba(255,255,255,.92);font-size:.95rem;color:#1a1a1a;font-family:inherit;outline:none;width:100%;direction:ltr}}
-  .adv-input:focus{{border-color:#f5d06e}}
-  .adv-select{{padding:9px 12px;border-radius:10px;border:1.5px solid rgba(255,255,255,.2);background:rgba(255,255,255,.92);font-size:.88rem;color:#1a1a1a;font-family:inherit;outline:none;width:100%;appearance:none;-webkit-appearance:none;direction:rtl}}
-  .adv-select:focus{{border-color:#f5d06e}}
-  .gender-grp{{display:flex;gap:6px}}
-  .gender-btn{{flex:1;padding:8px 6px;border-radius:9px;border:1.5px solid rgba(255,255,255,.25);background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);font-size:.82rem;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s;text-align:center}}
-  .gender-btn.active{{background:#f5d06e;color:#0d4f3c;border-color:#f5d06e}}
-  .adv-clear{{background:rgba(239,68,68,.25);color:#fca5a5;border:1.5px solid rgba(239,68,68,.35);border-radius:9px;padding:9px 13px;font-size:.82rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}}
-  .adv-clear:active{{transform:scale(.97)}}
-  .adv-badge{{display:inline-block;background:#ef4444;color:#fff;border-radius:50%;width:16px;height:16px;font-size:.62rem;font-weight:800;text-align:center;line-height:16px;margin-right:2px}}
   #results{{padding:16px;max-width:600px;margin:0 auto}}
   .state-msg{{text-align:center;color:rgba(255,255,255,.7);margin-top:60px;font-size:1rem}}
   .state-msg .icon{{font-size:3rem;display:block;margin-bottom:12px}}
@@ -443,33 +424,7 @@ def make_index(DECRYPT_JS, LOCK_HTML, H1, NAV, QR, CARDFILE, SWITCHER, REPORTS_J
     <button class="clear-btn" id="clearBtn" onclick="clearSearch()">✕</button>
   </div>
   <div class="search-actions">
-    <button class="btn-scan" onclick="openScan()">📷 مسح باركود الهوية</button>
-    <button class="btn-adv" id="advToggle" onclick="toggleAdv()">⚙️ بحث متقدم <span id="advBadge" style="display:none" class="adv-badge">0</span></button>
-  </div>
-  <div class="adv-panel" id="advPanel">
-    <div class="adv-row">
-      <div class="adv-field">
-        <span class="adv-label">🚌 رقم الباص</span>
-        <input class="adv-input" id="fBus" type="number" min="1" placeholder="مثال: 8" oninput="doSearch()">
-      </div>
-      <div class="adv-field">
-        <span class="adv-label">🏙️ المكتب</span>
-        <select class="adv-select" id="fOffice" onchange="doSearch()">
-          <option value="">الكل</option>
-        </select>
-      </div>
-    </div>
-    <div class="adv-row">
-      <div class="adv-field">
-        <span class="adv-label">👤 الجنس</span>
-        <div class="gender-grp">
-          <button class="gender-btn active" id="gAll" onclick="setGender('')">الكل</button>
-          <button class="gender-btn" id="gM" onclick="setGender('ذكر')">رجال</button>
-          <button class="gender-btn" id="gF" onclick="setGender('أنثى')">نساء</button>
-        </div>
-      </div>
-      <button class="adv-clear" onclick="clearAdv()">✕ مسح الفلاتر</button>
-    </div>
+    <button class="btn-scan" onclick="openScan()">📷 بحث سريع</button>
   </div>
 </header>
 <div id="results">
@@ -499,7 +454,6 @@ def make_index(DECRYPT_JS, LOCK_HTML, H1, NAV, QR, CARDFILE, SWITCHER, REPORTS_J
 <script>
 {DECRYPT_JS}
 let DATA=[],searchResults=[];const byId={{}},byPhone={{}},byResv={{}};
-let _fGender='';
 {WA_JS}
 {CLOUD_JS}
 {REPORTS_JS}
@@ -513,9 +467,6 @@ function onDataReady(d){{
     if(p.phone)(byPhone[p.phone]=byPhone[p.phone]||[]).push(p);
     if(p.resv)(byResv[p.resv]=byResv[p.resv]||[]).push(p);
   }});
-  const offices=[...new Set(d.map(p=>p.office||'').filter(Boolean))].sort();
-  const sel=document.getElementById('fOffice');
-  offices.forEach(o=>{{const op=document.createElement('option');op.value=o;op.textContent=o;sel.appendChild(op);}});
 }}
 const input=document.getElementById('searchInput');
 const clearBtn=document.getElementById('clearBtn');
@@ -524,45 +475,16 @@ let deb;
 input.addEventListener('input',()=>{{clearTimeout(deb);deb=setTimeout(doSearch,200);clearBtn.classList.toggle('visible',input.value.length>0)}});
 function clearSearch(){{input.value='';clearBtn.classList.remove('visible');doSearch();input.focus()}}
 function norm(s){{return(s||'').replace(/[أإآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').toLowerCase().trim()}}
-function getFilters(){{return{{bus:(document.getElementById('fBus').value||'').trim(),office:(document.getElementById('fOffice').value||''),gender:_fGender}};}}
-function hasFilters(){{const f=getFilters();return!!(f.bus||f.office||f.gender);}}
-function applyFilters(arr){{
-  const f=getFilters();
-  return arr.filter(p=>{{
-    if(f.bus&&p.bus!==f.bus)return false;
-    if(f.office&&(p.office||'')!==f.office)return false;
-    if(f.gender&&(p.gender||'')!==f.gender)return false;
-    return true;
-  }});
-}}
-function updateAdvBadge(){{
-  const f=getFilters();const n=[f.bus,f.office,f.gender].filter(Boolean).length;
-  const b=document.getElementById('advBadge');b.style.display=n?'inline-block':'none';b.textContent=n;
-  document.getElementById('advToggle').classList.toggle('active',n>0);
-}}
-function setGender(v){{
-  _fGender=v;
-  ['gAll','gM','gF'].forEach(id=>document.getElementById(id).classList.remove('active'));
-  document.getElementById(v===''?'gAll':v==='ذكر'?'gM':'gF').classList.add('active');
-  updateAdvBadge();doSearch();
-}}
-function toggleAdv(){{const p=document.getElementById('advPanel');p.classList.toggle('open');}}
-function clearAdv(){{document.getElementById('fBus').value='';document.getElementById('fOffice').value='';setGender('');updateAdvBadge();doSearch();}}
 function doSearch(){{
-  updateAdvBadge();
   const q=input.value.trim();
-  const filters=hasFilters();
-  if(!q&&!filters){{showEmpty();return}}
-  if(q.length===1&&!filters){{resultsDiv.innerHTML='<div class="state-msg"><span class="icon">✍️</span><p>اكتب أكثر...</p></div>';return}}
+  if(!q){{showEmpty();return}}
+  if(q.length===1){{resultsDiv.innerHTML='<div class="state-msg"><span class="icon">✍️</span><p>اكتب أكثر...</p></div>';return}}
   let m=[];
-  if(q){{
-    if(byId[q])m=[...byId[q]];
-    if(!m.length&&byPhone[q])m=[...byPhone[q]];
-    if(!m.length){{const alt=q.startsWith('0')?q.slice(1):'0'+q;if(byPhone[alt])m=[...byPhone[alt]]}}
-    if(!m.length){{const nq=norm(q);m=DATA.filter(p=>norm(p.name).includes(nq))}}
-    if(!m.length&&/^\\d+$/.test(q))m=DATA.filter(p=>p.id.includes(q));
-  }}else{{m=[...DATA];}}
-  if(filters)m=applyFilters(m);
+  if(byId[q])m=[...byId[q]];
+  if(!m.length&&byPhone[q])m=[...byPhone[q]];
+  if(!m.length){{const alt=q.startsWith('0')?q.slice(1):'0'+q;if(byPhone[alt])m=[...byPhone[alt]]}}
+  if(!m.length){{const nq=norm(q);m=DATA.filter(p=>norm(p.name).includes(nq))}}
+  if(!m.length&&/^\\d+$/.test(q))m=DATA.filter(p=>p.id.includes(q));
   const seen=new Set();m=m.filter(p=>{{const k=p.name+p.resv;if(seen.has(k))return false;seen.add(k);return true}});
   if(!m.length){{resultsDiv.innerHTML=`<div class="no-result"><span class="icon">😔</span><p>${{q?'لا نتائج لـ "<strong>'+q+'</strong>"':'لا نتائج للفلاتر المحددة'}}</p><small>تأكد من البيانات المدخلة</small></div>`;return}}
   let html='';
@@ -1324,7 +1246,7 @@ def make_landing(campaigns):
         '.foot{margin-top:30px;color:rgba(255,255,255,.4);font-size:.72rem}'
         '</style></head><body>'
         '<div class="home-head"><span class="k">🕋</span><h1>حملات الحج</h1>'
-        '<div class="ver-badge">v3.1</div>'
+        '<div class="ver-badge">v3.2</div>'
         '<p>اختر الحملة والخدمة</p>'
         '<div class="upd-date">آخر تحديث للبيانات: '+__import__('datetime').datetime.now().strftime('%d/%m/%Y')+'</div>'
         '</div>'
