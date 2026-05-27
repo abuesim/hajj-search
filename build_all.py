@@ -1021,6 +1021,28 @@ def make_supervisors(DECRYPT_JS, LOCK_HTML, H1, SEARCH_LINK, SWITCHER):
   .ric-title{{font-size:.72rem;color:#888;font-weight:600;margin-bottom:10px}}
   .ric-supvs{{display:flex;flex-wrap:wrap;gap:8px}}
   .ric-supv{{background:#e8f4ee;color:#0d4f3c;font-size:.9rem;font-weight:700;padding:7px 14px;border-radius:10px}}
+  /* Export mode */
+  .export-hdr{{display:flex;align-items:center;gap:10px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px 12px;margin-bottom:10px}}
+  .exp-back{{background:rgba(255,255,255,.15);border:none;color:white;border-radius:8px;padding:7px 12px;font-size:.82rem;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0}}
+  .exp-back:active{{transform:scale(.94)}}
+  .exp-supv{{flex:1;color:#f5d06e;font-weight:800;font-size:1rem;text-align:center}}
+  .exp-cnt{{color:rgba(255,255,255,.85);font-size:.78rem;font-weight:700;background:rgba(245,208,110,.15);border-radius:20px;padding:3px 10px;flex-shrink:0;direction:ltr}}
+  .export-actions{{display:flex;gap:6px;margin-bottom:12px}}
+  .exp-act{{flex:1;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);color:white;border-radius:10px;padding:9px 6px;font-size:.78rem;font-weight:700;cursor:pointer;font-family:inherit;transition:.1s}}
+  .exp-act:active{{transform:scale(.95)}}
+  .exp-export{{background:#f5d06e!important;color:#0d4f3c!important;border:none!important;font-size:.85rem!important;font-weight:800!important;flex:1.5!important}}
+  .exp-row{{display:flex;align-items:center;gap:11px;background:white;border-radius:11px;padding:10px 12px;margin-bottom:6px;cursor:pointer;transition:background .1s;animation:fadeUp .15s ease}}
+  .exp-row.checked{{background:#e8f5ee}}
+  .exp-row.disabled{{background:#f0f0f0;opacity:.55;cursor:not-allowed}}
+  .exp-check{{width:24px;height:24px;border-radius:7px;background:white;border:2px solid #ccc;display:flex;align-items:center;justify-content:center;font-weight:800;color:#0d4f3c;flex-shrink:0;font-size:.9rem;line-height:1}}
+  .exp-row.checked .exp-check{{background:#0d4f3c;border-color:#0d4f3c;color:white}}
+  .exp-row.disabled .exp-check{{background:#e5e5e5;border-color:#bbb;color:#999}}
+  .exp-num{{background:#f5d06e;color:#0d4f3c;font-weight:800;font-size:.72rem;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0}}
+  .exp-info{{flex:1;min-width:0}}
+  .exp-name{{font-size:.93rem;color:#0d4f3c;font-weight:700;line-height:1.3}}
+  .exp-row.disabled .exp-name{{color:#888}}
+  .exp-phone{{font-size:.74rem;color:#888;direction:ltr;text-align:right;margin-top:3px;font-family:'Courier New',monospace}}
+  .exp-mark{{color:#0d4f3c;font-weight:800;margin-left:3px}}
   /* Pilgrim rows inside rooms */
   .pil-list{{padding:6px 10px 8px}}
   .pil-row{{display:flex;align-items:center;gap:9px;padding:7px 4px;border-radius:8px;border-bottom:1px solid #f5f5f5}}
@@ -1053,6 +1075,7 @@ def make_supervisors(DECRYPT_JS, LOCK_HTML, H1, SEARCH_LINK, SWITCHER):
   <div class="mode-toggle">
     <button class="mode-btn active" id="mSupv" onclick="setMode('supv')">👤 المشرفون</button>
     <button class="mode-btn" id="mRoom" onclick="setMode('room')">🏠 الغرف</button>
+    <button class="mode-btn" id="mExport" onclick="setMode('export')">📞 سحب الأرقام</button>
   </div>
   <div class="search-wrap">
     <input type="search" id="searchInput" placeholder="ابحث باسم المشرف..." autocomplete="off" autocorrect="off" spellcheck="false">
@@ -1072,11 +1095,14 @@ def make_supervisors(DECRYPT_JS, LOCK_HTML, H1, SEARCH_LINK, SWITCHER):
 let DATA=[];
 const bySupv={{}};  // name → {{total,male,female,rooms:{{roomNum:[pilgrims]}}}}
 const byRoom={{}};  // roomNum → {{supervisor,pilgrims}}
+const byResv={{}};  // resv → [pilgrims]
 let supvNames=[];
 let _mode='supv';
 let _openSupv=-1;
 let _openRoom='';
 let _openRoomSub='';
+let _expSupv=-1;
+let _expUnchecked=new Set();
 
 // Strip leading section prefix: "1-615" → "615", "14-411" → "411", "615" → "615"
 function roomKey(mina){{
@@ -1098,6 +1124,7 @@ function onDataReady(d){{
     s.rooms[rm].push(p);
     if(!byRoom[rm])byRoom[rm]={{supervisor:sv,pilgrims:[]}};
     byRoom[rm].pilgrims.push(p);
+    if(p.resv){{if(!byResv[p.resv])byResv[p.resv]=[];byResv[p.resv].push(p);}}
   }});
   supvNames=Object.keys(bySupv).sort();
   const totalRooms=Object.keys(byRoom).length;
@@ -1114,11 +1141,12 @@ window.addEventListener('DOMContentLoaded',()=>{{
 }});
 
 function setMode(m){{
-  _mode=m;_openSupv=-1;_openRoom='';_openRoomSub='';
+  _mode=m;_openSupv=-1;_openRoom='';_openRoomSub='';_expSupv=-1;_expUnchecked=new Set();
   inp().value='';
   document.getElementById('mSupv').classList.toggle('active',m==='supv');
   document.getElementById('mRoom').classList.toggle('active',m==='room');
-  inp().placeholder=m==='supv'?'ابحث باسم المشرف...':'ابحث برقم الغرفة...';
+  document.getElementById('mExport').classList.toggle('active',m==='export');
+  inp().placeholder=m==='supv'?'ابحث باسم المشرف...':m==='room'?'ابحث برقم الغرفة...':'ابحث في المشرفين...';
   render('');
 }}
 
@@ -1126,7 +1154,8 @@ function render(q){{
   const div=document.getElementById('results');
   if(!supvNames.length)return;
   if(_mode==='supv') renderSupv(q,div);
-  else renderRooms(q,div);
+  else if(_mode==='room') renderRooms(q,div);
+  else renderExport(q,div);
 }}
 
 function renderSupv(q,div){{
@@ -1235,6 +1264,129 @@ function selectRoom(rmEnc){{
 function toggleSupv(idx){{_openSupv=_openSupv===idx?-1:idx;_openRoomSub='';render(inp().value.trim());}}
 function toggleRoomSub(enc){{const key=decodeURIComponent(enc);_openRoomSub=_openRoomSub===key?'':key;render(inp().value.trim());}}
 
+// ── Export tab ──
+function normPhone(ph){{
+  let n=(ph||'').replace(/\\D/g,'');
+  if(!n)return'';
+  if(n.startsWith('00966'))return n;
+  if(n.startsWith('966'))return'00'+n;
+  if(n.startsWith('0'))n=n.slice(1);
+  return'00966'+n;
+}}
+function hasFemaleInResv(p){{
+  if(p.gender!=='ذكر'||!p.resv)return false;
+  const grp=byResv[p.resv]||[];
+  return grp.some(m=>m.gender==='أنثى');
+}}
+function supvPilgrims(svIdx){{
+  const sv=supvNames[svIdx];
+  const info=bySupv[sv];
+  const all=[];
+  Object.values(info.rooms).forEach(arr=>arr.forEach(p=>all.push(p)));
+  all.sort((a,b)=>{{
+    const ra=parseInt(roomKey(a.mina))||9999,rb=parseInt(roomKey(b.mina))||9999;
+    if(ra!==rb)return ra-rb;
+    return(a.name||'').localeCompare(b.name||'','ar');
+  }});
+  // dedupe by normalized phone (keep first)
+  const seen=new Set();
+  return all.filter(p=>{{
+    const ph=normPhone(p.phone);
+    if(ph){{if(seen.has(ph))return false;seen.add(ph);}}
+    return true;
+  }});
+}}
+function renderExport(q,div){{
+  if(_expSupv<0){{
+    // Stage A: pick supervisor
+    const list=q?supvNames.filter(n=>n.includes(q)):supvNames;
+    if(!list.length){{div.innerHTML=NO_RES;return;}}
+    let html=`<div class="count-info">اختر مشرفاً لسحب أرقام حجاجه · ${{list.length}}</div>`;
+    list.forEach(sv=>{{
+      const realIdx=supvNames.indexOf(sv);
+      const info=bySupv[sv];
+      const phs=Object.values(info.rooms).flat().filter(p=>p.phone).length;
+      html+=`<div class="supv-card"><div class="supv-row" onclick="pickExp(${{realIdx}})">
+        <div class="supv-avatar">${{sv.charAt(0)}}</div>
+        <div class="supv-info">
+          <div class="supv-name">${{shortName(sv)}}</div>
+          <div class="supv-meta">${{info.total}} حاج &nbsp;·&nbsp; <span style="color:#1a7a5e">📱 ${{phs}}</span></div>
+        </div>
+        <div class="supv-arrow">←</div>
+      </div></div>`;
+    }});
+    div.innerHTML=html;
+    return;
+  }}
+  // Stage B: pilgrim selection for chosen supervisor
+  const sv=supvNames[_expSupv];
+  const list=supvPilgrims(_expSupv);
+  const withPhone=list.filter(p=>p.phone).length;
+  const chk=list.filter(p=>p.phone&&!_expUnchecked.has(p.id||p.name)).length;
+  const filt=q?list.filter(p=>norm(p.name).includes(norm(q))):list;
+  let html=`<div class="export-hdr">
+    <button class="exp-back" onclick="backExp()">←</button>
+    <div class="exp-supv">${{shortName(sv)}}</div>
+    <div class="exp-cnt">${{chk}} / ${{withPhone}}</div>
+  </div>
+  <div class="export-actions">
+    <button class="exp-act" onclick="selAllExp()">✓ الكل</button>
+    <button class="exp-act" onclick="unselAllExp()">✕ إلغاء</button>
+    <button class="exp-act exp-export" onclick="doExport()">📥 تصدير ${{chk}}</button>
+  </div>
+  <div>`;
+  filt.forEach((p)=>{{
+    const key=p.id||p.name;
+    const has=!!p.phone;
+    const checked=has&&!_expUnchecked.has(key);
+    const isF=p.gender==='أنثى';
+    const mix=hasFemaleInResv(p);
+    const ph=normPhone(p.phone);
+    html+=`<div class="exp-row ${{has?(checked?'checked':''):'disabled'}}" ${{has?`onclick="togExp('${{key.replace(/'/g,"\\\\'")}}')"`:''}}>
+      <div class="exp-check">${{checked?'✓':(has?'':'—')}}</div>
+      <div class="exp-info">
+        <div class="exp-name">${{mix?'<span class="exp-mark">$</span> ':''}}${{shortName(p.name)}}${{isF?' <span style="color:#c0396e">♀</span>':''}}</div>
+        <div class="exp-phone">${{ph||'بدون جوال'}}</div>
+      </div>
+    </div>`;
+  }});
+  html+=`</div>`;
+  div.innerHTML=html;
+}}
+function pickExp(idx){{_expSupv=idx;_expUnchecked=new Set();inp().value='';inp().placeholder='ابحث في الحجاج...';render('');}}
+function backExp(){{_expSupv=-1;_expUnchecked=new Set();inp().value='';inp().placeholder='ابحث في المشرفين...';render('');}}
+function togExp(key){{if(_expUnchecked.has(key))_expUnchecked.delete(key);else _expUnchecked.add(key);render(inp().value.trim());}}
+function selAllExp(){{_expUnchecked=new Set();render(inp().value.trim());}}
+function unselAllExp(){{
+  supvPilgrims(_expSupv).forEach(p=>{{if(p.phone)_expUnchecked.add(p.id||p.name);}});
+  render(inp().value.trim());
+}}
+function doExport(){{
+  const sv=supvNames[_expSupv];
+  const list=supvPilgrims(_expSupv).filter(p=>p.phone&&!_expUnchecked.has(p.id||p.name));
+  if(!list.length){{alert('لا يوجد أرقام محددة');return;}}
+  let vcf='';
+  list.forEach((p,i)=>{{
+    const num=(i+1);
+    const mark=hasFemaleInResv(p)?'$ ':'';
+    const fn=num+' | '+mark+shortName(p.name);
+    const ph=normPhone(p.phone);
+    vcf+='BEGIN:VCARD\\r\\n';
+    vcf+='VERSION:3.0\\r\\n';
+    vcf+='FN:'+fn+'\\r\\n';
+    vcf+='N:'+fn+';;;;\\r\\n';
+    vcf+='TEL;TYPE=CELL:'+ph+'\\r\\n';
+    vcf+='END:VCARD\\r\\n';
+  }});
+  const safe=shortName(sv).replace(/\\s+/g,'_').replace(/[^\\u0600-\\u06FF\\w_]/g,'');
+  const fname='حجاج_'+safe+'.vcf';
+  const blob=new Blob([vcf],{{type:'text/vcard;charset=utf-8'}});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=fname;document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
+}}
+function norm(s){{return(s||'').replace(/[أإآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').toLowerCase().trim()}}
+
 const NO_RES='<div class="no-result"><span class="icon">🔍</span><p>لا توجد نتائج</p></div>';
 {DECRYPT_JS}
 initAuth();
@@ -1279,7 +1431,7 @@ def make_landing(campaigns):
         '.foot{margin-top:30px;color:rgba(255,255,255,.4);font-size:.72rem}'
         '</style></head><body>'
         '<div class="home-head"><span class="k">🕋</span><h1>حملات الحج</h1>'
-        '<div class="ver-badge">v3.3</div>'
+        '<div class="ver-badge">v3.4</div>'
         '<p>اختر الحملة والخدمة</p>'
         '<div class="upd-date">آخر تحديث للبيانات: '+__import__('datetime').datetime.now().strftime('%d/%m/%Y')+'</div>'
         '</div>'
