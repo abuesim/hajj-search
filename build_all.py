@@ -321,7 +321,7 @@ async function initAuth(){
 # ════════════════════════════════
 # index.html  (search) — built per campaign
 # ════════════════════════════════
-def make_index(DECRYPT_JS, LOCK_HTML, H1, NAV, QR, CARDFILE, SWITCHER, REPORTS_JS, REPORTS_LINK, SCAN_LINK, DASH_LINK=''):
+def make_index(DECRYPT_JS, LOCK_HTML, H1, NAV, QR, CARDFILE, SWITCHER, REPORTS_JS, REPORTS_LINK, SCAN_LINK, DASH_LINK='', SUPV_LINK=''):
     return f"""<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -377,8 +377,8 @@ def make_index(DECRYPT_JS, LOCK_HTML, H1, NAV, QR, CARDFILE, SWITCHER, REPORTS_J
   .info-box{{flex:1;background:#f8fffe;border-radius:12px;padding:12px 14px;text-align:center;border:1.5px solid #e0f5ef}}
   .info-box .label{{font-size:.7rem;color:#888;display:block;margin-bottom:4px;font-weight:600;letter-spacing:.5px}}
   .info-box .value{{font-size:1.35rem;font-weight:800;color:#0d4f3c;direction:ltr;display:block}}
-  .info-box.bus .value{{font-size:2rem;color:#e07b00}}
-  .info-box.bus{{border-color:#fde8c0;background:#fffbf3}}
+  .info-box.supv{{border-color:#d4eee4;background:#f5fdf8;flex:2}}
+  .info-box.supv .value{{font-size:.82rem;color:#1a7a5e;direction:rtl;font-weight:700;line-height:1.35}}
   .info-box.mina .value{{font-size:1.05rem;color:#1a4a7a;direction:ltr}}
   .info-box.mina{{border-color:#c0d8fd;background:#f3f8ff}}
   .qr-btn{{background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.35);border-radius:10px;padding:7px 10px;color:white;font-size:1.15rem;cursor:pointer;flex-shrink:0;margin-top:2px;line-height:1}}
@@ -388,18 +388,29 @@ def make_index(DECRYPT_JS, LOCK_HTML, H1, NAV, QR, CARDFILE, SWITCHER, REPORTS_J
   .qr-img{{width:220px;height:220px;border-radius:12px;display:block;margin:0 auto 10px}}
   .qr-hint{{font-size:.75rem;color:#888;margin-bottom:16px}}
   .qr-close{{background:#0d4f3c;color:white;border:none;border-radius:12px;padding:10px 32px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:inherit}}
-  .scan-modal{{display:none;position:fixed;inset:0;z-index:9991;background:rgba(0,0,0,.92);flex-direction:column;align-items:center;justify-content:flex-start;padding:20px 16px}}
+  .scan-modal{{display:none;position:fixed;inset:0;z-index:9991;background:rgba(0,0,0,.95);flex-direction:column;align-items:center;justify-content:flex-start;padding:14px 14px 0}}
   .scan-modal.open{{display:flex;animation:fadeUp .2s ease}}
-  .scan-hdr{{width:100%;max-width:480px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}}
-  .scan-title{{color:#f5d06e;font-size:1.05rem;font-weight:700}}
-  .scan-close{{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:white;border-radius:10px;padding:8px 14px;font-size:.85rem;font-weight:700;cursor:pointer;font-family:inherit}}
-  #scanReader{{border-radius:18px;overflow:hidden;border:3px solid rgba(245,208,110,.55);background:#111;width:100%;max-width:480px}}
-  #scanHint{{color:rgba(255,255,255,.8);font-size:.9rem;margin-top:12px;text-align:center;max-width:360px;line-height:1.6}}
+  .scan-hdr{{width:100%;max-width:480px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}}
+  .scan-title{{color:#f5d06e;font-size:1rem;font-weight:700}}
+  .scan-counter{{background:rgba(245,208,110,.2);color:#f5d06e;border-radius:20px;padding:3px 12px;font-size:.78rem;font-weight:700;border:1px solid rgba(245,208,110,.35)}}
+  .scan-close{{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:white;border-radius:10px;padding:7px 12px;font-size:.82rem;font-weight:700;cursor:pointer;font-family:inherit}}
+  #scanReader{{border-radius:14px;overflow:hidden;border:2.5px solid rgba(245,208,110,.5);background:#111;width:100%;max-width:480px;max-height:200px}}
+  #scanHint{{color:rgba(255,255,255,.6);font-size:.78rem;margin-top:6px;text-align:center;line-height:1.5;min-height:1.6em}}
+  .scan-list{{width:100%;max-width:480px;flex:1;overflow-y:auto;margin-top:10px;padding-bottom:20px}}
+  .scan-item{{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px 12px;margin-bottom:7px;animation:fadeUp .15s ease}}
+  .scan-item-idx{{width:22px;height:22px;border-radius:50%;background:#f5d06e;color:#0d4f3c;font-size:.68rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}}
+  .scan-item-info{{flex:1;min-width:0}}
+  .scan-item-name{{color:white;font-size:.95rem;font-weight:600;line-height:1.3}}
+  .scan-item-sub{{color:rgba(255,255,255,.45);font-size:.72rem;margin-top:2px;direction:ltr}}
+  .scan-item-go{{background:#f5d06e;color:#0d4f3c;border:none;border-radius:8px;padding:7px 13px;font-size:.82rem;font-weight:800;cursor:pointer;font-family:inherit;flex-shrink:0;transition:transform .1s}}
+  .scan-item-go:active{{transform:scale(.92)}}
+  .scan-empty{{text-align:center;color:rgba(255,255,255,.3);font-size:.85rem;margin-top:20px}}
   .group-banner{{background:linear-gradient(90deg,#e07b00,#f5a623);color:white;text-align:center;padding:8px 16px;font-size:.82rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px}}
   .group-list{{padding:10px 14px 14px}}
   .group-member{{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;border-bottom:1px solid #f0f0f0}}
   .group-member:last-child{{border-bottom:none}}
   .group-member.is-self{{background:#edfaf5}}
+  .group-member.female{{background:#fff0f6}}
   .member-num{{width:26px;height:26px;border-radius:50%;background:#1a7a5e;color:white;font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}}
   .member-num.self{{background:#f5d06e;color:#0d4f3c}}
   .member-name{{font-size:.92rem;color:#1a1a1a;font-weight:500;flex:1}}
@@ -424,7 +435,7 @@ def make_index(DECRYPT_JS, LOCK_HTML, H1, NAV, QR, CARDFILE, SWITCHER, REPORTS_J
   {SWITCHER}
   <div class="hdr-row">
     <h1>🕋 {H1} <span style="font-size:.55em;opacity:.6;font-weight:400">v1.2</span></h1>
-    <div style="display:flex;gap:5px;flex-shrink:0">{'<a href="'+DASH_LINK+'" class="nav-link">📊 لوحة</a>' if DASH_LINK else ''}<a href="{REPORTS_LINK}" class="nav-link">🚩 بلاغات</a><a href="{NAV}" class="nav-link">📋 بيانات</a></div>
+    <div style="display:flex;gap:5px;flex-shrink:0">{'<a href="'+DASH_LINK+'" class="nav-link">📊 لوحة</a>' if DASH_LINK else ''}{'<a href="'+SUPV_LINK+'" class="nav-link">👥 مشرفين</a>' if SUPV_LINK else ''}<a href="{REPORTS_LINK}" class="nav-link">🚩 بلاغات</a><a href="{NAV}" class="nav-link">📋 بيانات</a></div>
   </div>
   <div class="search-wrap">
     <input type="search" id="searchInput" placeholder="ابحث بالاسم أو الهوية أو الجوال..." autocomplete="off" autocorrect="off" spellcheck="false" inputmode="search">
@@ -474,11 +485,15 @@ def make_index(DECRYPT_JS, LOCK_HTML, H1, NAV, QR, CARDFILE, SWITCHER, REPORTS_J
 </div>
 <div id="scanModal" class="scan-modal">
   <div class="scan-hdr">
-    <span class="scan-title">📷 مسح باركود الهوية</span>
-    <button class="scan-close" onclick="closeScan()">إغلاق ✕</button>
+    <span class="scan-title">📷 مسح متتالي</span>
+    <span class="scan-counter" id="scanCounter">0 حاج</span>
+    <button class="scan-close" onclick="closeScan()">✕ إنهاء</button>
   </div>
   <div id="scanReader"></div>
-  <div id="scanHint">وجّه الكاميرا على باركود الهوية الوطنية أو الإقامة</div>
+  <div id="scanHint">وجّه الكاميرا على باركود الهوية...</div>
+  <div class="scan-list" id="scanList">
+    <div class="scan-empty">امسح بطاقة الهوية لإضافة حاج</div>
+  </div>
 </div>
 <script src="html5-qrcode.min.js"></script>
 <script>
@@ -488,7 +503,7 @@ let _fGender='';
 {WA_JS}
 {CLOUD_JS}
 {REPORTS_JS}
-function makeCardUrl(p){{const grp=byResv[p.resv]||[p];const main={{name:p.name,mina:p.mina||'',main:true}};const rest=grp.filter(m=>m.name!==p.name).map(m=>({{name:m.name,mina:m.mina||''}}));const group=[main,...rest];let bin='';new TextEncoder().encode(JSON.stringify(group)).forEach(b=>bin+=String.fromCharCode(b));const g=btoa(bin);return 'https://abuesim.github.io/hajj-search/{CARDFILE}?b='+encodeURIComponent(p.bus||'')+'&g='+encodeURIComponent(g);}}
+function makeCardUrl(p){{const grp=byResv[p.resv]||[p];const main={{name:p.name,mina:p.mina||'',supervisor:p.supervisor||'',main:true}};const rest=grp.filter(m=>m.name!==p.name).map(m=>({{name:m.name,mina:m.mina||'',gender:m.gender||''}}));const group=[main,...rest];let bin='';new TextEncoder().encode(JSON.stringify(group)).forEach(b=>bin+=String.fromCharCode(b));const g=btoa(bin);return 'https://abuesim.github.io/hajj-search/{CARDFILE}?b='+encodeURIComponent(p.bus||'')+'&g='+encodeURIComponent(g);}}
 function showQRModal(i){{const p=searchResults[i];if(!p)return;const u=makeCardUrl(p);document.getElementById('qrModalName').textContent=p.name;document.getElementById('qrImg').src='https://api.qrserver.com/v1/create-qr-code/?size=220x220&color={QR}&bgcolor=ffffff&qzone=2&data='+encodeURIComponent(u);document.getElementById('qrModal').style.display='flex';}}
 function closeQR(){{document.getElementById('qrModal').style.display='none';}}
 function onDataReady(d){{
@@ -557,10 +572,11 @@ function doSearch(){{
     const grp=byResv[p.resv]||[];
     const minaBox=p.mina?`<div class="info-box mina"><span class="label">سكن منى</span><span class="value" style="font-size:1.05rem">${{p.mina}}</span></div>`:'';
     const waBtn=p.phone?`<a class="wa-ic wa-card" href="${{waLink(p.phone)}}" target="_blank" rel="noopener" title="مراسلة واتساب">${{WA_SVG}}</a>`:'';
-    html+=`<div class="result-card"><div class="card-header" style="display:flex;align-items:flex-start;justify-content:space-between"><div><div class="pilgrim-label">الحاج / الحاجة</div><div class="pilgrim-name">${{p.name}}</div></div><div style="display:flex;gap:6px"><button class="rpt-btn-ic" onclick="report(searchResults[${{i}}])" title="بلاغ">${{RPT_SVG}}</button><button class="qr-btn" onclick="showQRModal(${{i}})">📱</button></div></div><div class="card-body"><div class="info-box"><span class="label">رقم الحجز</span><span class="value" style="font-size:1.15rem">${{p.resv||'—'}}</span></div><div class="info-box bus"><span class="label">الباص</span><span class="value">${{p.bus||'—'}}</span></div>${{minaBox}}${{waBtn}}</div>`;
-    if(grp.length>1){{
-      html+=`<div class="group-banner"><span>👥</span> رفقاء الحجز · ${{grp.length}} أشخاص</div><div class="group-list">`;
-      grp.forEach((mem,i)=>{{const s=mem.name===p.name;const md=JSON.stringify(mem).replace(/'/g,'&#39;');html+=`<div class="group-member${{s?' is-self':''}}"><div class="member-num${{s?' self':''}}">${{i+1}}</div><div class="member-name">${{mem.name}}</div>${{mem.mina?`<span class="member-mina">${{mem.mina}}</span>`:''}}${{mem.phone?`<a class="wa-ic wa-mini" href="${{waLink(mem.phone)}}" target="_blank" rel="noopener" title="مراسلة واتساب">${{WA_SVG}}</a>`:''}}<button class="rpt-mini" onclick='report(${{md}})' title="بلاغ">${{RPT_SVG}}</button>${{s?'<span class="you-badge">أنت</span>':''}}</div>`}});
+    html+=`<div class="result-card"><div class="card-header" style="display:flex;align-items:flex-start;justify-content:space-between"><div><div class="pilgrim-label">الحاج / الحاجة</div><div class="pilgrim-name">${{p.name}}</div></div><div style="display:flex;gap:6px"><button class="rpt-btn-ic" onclick="report(searchResults[${{i}}])" title="بلاغ">${{RPT_SVG}}</button><button class="qr-btn" onclick="showQRModal(${{i}})">📱</button></div></div><div class="card-body"><div class="info-box"><span class="label">رقم الحجز</span><span class="value" style="font-size:1.15rem">${{p.resv||'—'}}</span></div><div class="info-box supv"><span class="label">المشرف</span><span class="value">${{p.supervisor||'—'}}</span></div>${{minaBox}}${{waBtn}}</div>`;
+    const othrs=grp.filter(m=>m.name!==p.name);
+    if(othrs.length>0){{
+      html+=`<div class="group-banner"><span>👥</span> رفقاء الحجز · ${{othrs.length}} أشخاص</div><div class="group-list">`;
+      othrs.forEach((mem,mi)=>{{const md=JSON.stringify(mem).replace(/'/g,'&#39;');const isF=mem.gender==='أنثى';const gclr=isF?'#c0396e':'#1a7a5e';const gico=isF?'♀':'♂';html+=`<div class="group-member${{isF?' female':''}}"><div class="member-num" style="background:${{gclr}}">${{mi+1}}</div><div class="member-name">${{mem.name}}<span style="font-size:.65rem;margin-right:4px;color:${{gclr}};opacity:.75">${{gico}}</span></div>${{mem.mina?`<span class="member-mina">${{mem.mina}}</span>`:''}}${{mem.phone?`<a class="wa-ic wa-mini" href="${{waLink(mem.phone)}}" target="_blank" rel="noopener" title="مراسلة واتساب">${{WA_SVG}}</a>`:''}}<button class="rpt-mini" onclick='report(${{md}})' title="بلاغ">${{RPT_SVG}}</button></div>`}});
       html+='</div>';
     }}
     html+='</div>';
@@ -569,16 +585,21 @@ function doSearch(){{
   resultsDiv.innerHTML=html;
 }}
 function showEmpty(){{resultsDiv.innerHTML='<div class="state-msg"><span class="icon">🔍</span><p>ابحث عن الحاج للعثور على معلومات الحجز والباص</p></div>'}}
-// ── Inline barcode scan ──
+// ── Inline barcode scan — continuous mode ──
 let _h5=null,_scanning=false;
+let _scanList=[],_scanIds=new Set(),_lastScanId='';
 function openScan(){{
+  _scanList=[];_scanIds=new Set();_lastScanId='';
+  document.getElementById('scanList').innerHTML='<div class="scan-empty">امسح بطاقة الهوية لإضافة حاج</div>';
+  document.getElementById('scanCounter').textContent='0 حاج';
+  document.getElementById('scanHint').textContent='وجّه الكاميرا على باركود الهوية...';
   document.getElementById('scanModal').classList.add('open');
   if(typeof Html5Qrcode==='undefined'){{document.getElementById('scanHint').innerHTML='⚠️ تعذّر تحميل أداة المسح';return;}}
   if(!_h5)_h5=new Html5Qrcode('scanReader');
   if(_scanning)return;
-  _h5.start({{facingMode:'environment'}},{{fps:10,qrbox:{{width:240,height:180}}}},_onScan,()=>{{}})
+  _h5.start({{facingMode:'environment'}},{{fps:10,qrbox:{{width:220,height:130}}}},_onScan,()=>{{}})
     .then(()=>{{_scanning=true;}})
-    .catch(e=>{{document.getElementById('scanHint').innerHTML='⚠️ يحتاج إذن الكاميرا. تأكد من السماح وأن الرابط https<br><small>'+e+'</small>';}});
+    .catch(e=>{{document.getElementById('scanHint').innerHTML='⚠️ يحتاج إذن الكاميرا<br><small>'+e+'</small>';}});
 }}
 function closeScan(){{
   document.getElementById('scanModal').classList.remove('open');
@@ -592,15 +613,36 @@ function _findId(t){{
   if(m&&byId[m[0]])return m[0];
   return d;
 }}
+function _goDetail(id){{
+  closeScan();
+  input.value=id;clearBtn.classList.add('visible');doSearch();
+}}
+function _renderScanList(){{
+  const el=document.getElementById('scanList');
+  el.innerHTML=_scanList.map((p,i)=>`
+    <div class="scan-item">
+      <div class="scan-item-idx">${{_scanList.length-i}}</div>
+      <div class="scan-item-info">
+        <div class="scan-item-name">${{p.name}}</div>
+        <div class="scan-item-sub">${{p.mina||''}}${{(()=>{{const sv=(p.supervisor||'').trim().split(/\\s+/).filter(Boolean);const s=sv.length<=2?p.supervisor||'':sv[0]+' '+sv[sv.length-1];return s?(p.mina?' · ':'')+s:'';}})()}}</div>
+      </div>
+      <button class="scan-item-go" onclick="_goDetail('${{p.id}}')">←</button>
+    </div>`).join('');
+}}
 function _onScan(t){{
   const id=_findId(t);
+  if(id===_lastScanId)return;  // ignore same card re-read
+  _lastScanId=id;
+  setTimeout(()=>{{_lastScanId='';}},2500);  // cooldown 2.5s per card
   const hits=byId[id];
-  if(!hits||!hits.length){{document.getElementById('scanHint').innerHTML='❌ غير مسجّل: '+id+'<br><small>حاول مرة أخرى</small>';return;}}
-  if(navigator.vibrate)navigator.vibrate(90);
-  closeScan();
-  input.value=id;
-  clearBtn.classList.add('visible');
-  doSearch();
+  if(!hits||!hits.length){{document.getElementById('scanHint').textContent='❌ غير مسجّل: '+id;return;}}
+  if(_scanIds.has(id)){{document.getElementById('scanHint').textContent='⚠️ تم مسحه مسبقاً';return;}}
+  if(navigator.vibrate)navigator.vibrate(80);
+  _scanIds.add(id);
+  _scanList.unshift(hits[0]);
+  document.getElementById('scanCounter').textContent=_scanList.length+' حاج';
+  document.getElementById('scanHint').textContent='✅ '+hits[0].name;
+  _renderScanList();
 }}
 initAuth();
 </script>
@@ -635,8 +677,8 @@ CARD = """<!DOCTYPE html>
   .card{background:white;border-radius:24px;overflow:hidden;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.35)}
   .card-top{background:linear-gradient(135deg,#1a7a5e,#0d4f3c);padding:20px 24px;text-align:center}
   .co{color:rgba(255,255,255,.65);font-size:.72rem;letter-spacing:1px;margin-bottom:8px}
-  .bus-lbl{color:rgba(255,255,255,.6);font-size:.68rem;margin-bottom:2px}
-  .bus-num{color:#f5d06e;font-size:2.8rem;font-weight:800;line-height:1.1}
+  .supv-lbl{color:rgba(255,255,255,.6);font-size:.68rem;margin-bottom:4px}
+  .supv-name{color:#f5d06e;font-size:1.05rem;font-weight:700;line-height:1.3}
   .main-sec{padding:16px 20px 14px;background:#f5fdf8;border-bottom:2px solid #d4eee4}
   .main-lbl{font-size:.64rem;color:#888;font-weight:600;letter-spacing:.5px;margin-bottom:4px}
   .main-name{font-size:1.2rem;font-weight:700;color:#0d4f3c;line-height:1.4;margin-bottom:8px}
@@ -645,8 +687,9 @@ CARD = """<!DOCTYPE html>
   .mina-val{font-size:.95rem;font-weight:800;color:#1a4a7a;direction:ltr}
   .comp-sec{padding:10px 18px 14px}
   .sec-title{font-size:.66rem;color:#aaa;font-weight:600;letter-spacing:.5px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0f0f0}
-  .mrow{display:flex;align-items:center;gap:10px;padding:7px 2px;border-bottom:1px solid #f5f5f5}
+  .mrow{display:flex;align-items:center;gap:10px;padding:7px 6px;border-radius:7px;border-bottom:1px solid #f5f5f5}
   .mrow:last-child{border-bottom:none}
+  .mrow.female{background:#fff0f6}
   .mnum{width:22px;height:22px;border-radius:50%;background:#1a7a5e;color:white;font-size:.7rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
   .mname{font-size:.88rem;color:#333;font-weight:500;flex:1;line-height:1.3}
   .mmina{font-size:.74rem;color:#1a4a7a;font-weight:700;background:#eef4ff;border-radius:5px;padding:2px 7px;direction:ltr;flex-shrink:0;white-space:nowrap}
@@ -657,8 +700,8 @@ CARD = """<!DOCTYPE html>
 <div class="card">
   <div class="card-top">
     <div class="co">🕋 __CO__</div>
-    <div class="bus-lbl">الباص</div>
-    <div class="bus-num" id="cbus">—</div>
+    <div class="supv-lbl">المشرف</div>
+    <div class="supv-name" id="csupv">—</div>
   </div>
   <div class="main-sec">
     <div class="main-lbl">الحاج / الحاجة</div>
@@ -676,13 +719,13 @@ CARD = """<!DOCTYPE html>
 </div>
 <script>
   const p=new URLSearchParams(location.search);
-  document.getElementById('cbus').textContent=p.get('b')||'—';
   const gRaw=p.get('g');
   if(gRaw){
     try{
       const bytes=Uint8Array.from(atob(gRaw),c=>c.charCodeAt(0));
       const group=JSON.parse(new TextDecoder().decode(bytes));
       const main=group[0];
+      document.getElementById('csupv').textContent=main.supervisor||p.get('b')||'—';
       document.getElementById('mainName').textContent=main.name||'—';
       if(main.mina){document.getElementById('mainMina').textContent=main.mina;}
       else{document.getElementById('mainMinaBox').style.display='none';}
@@ -690,9 +733,12 @@ CARD = """<!DOCTYPE html>
       if(companions.length>0){
         const list=document.getElementById('compList');
         companions.forEach((m,i)=>{
+          const isF=m.gender==='أنثى';
+          const gclr=isF?'#c0396e':'#1a7a5e';
+          const gico=isF?'♀':'♂';
           const row=document.createElement('div');
-          row.className='mrow';
-          row.innerHTML='<span class="mnum">'+(i+1)+'</span><span class="mname">'+m.name+'</span>'+(m.mina?'<span class="mmina">'+m.mina+'</span>':'');
+          row.className='mrow'+(isF?' female':'');
+          row.innerHTML='<span class="mnum" style="background:'+gclr+'">'+(i+1)+'</span><span class="mname">'+m.name+'<span style="font-size:.6rem;margin-right:3px;color:'+gclr+';opacity:.75">'+gico+'</span></span>'+(m.mina?'<span class="mmina">'+m.mina+'</span>':'');
           list.appendChild(row);
         });
       } else {
@@ -735,12 +781,14 @@ def make_scan(DECRYPT_JS, LOCK_HTML, SWITCHER, SEARCH_LINK):
   .info-box{{flex:1;min-width:88px;background:#f8fffe;border-radius:12px;padding:12px;text-align:center;border:1.5px solid #e0f5ef}}
   .info-box .label{{font-size:.7rem;color:#888;display:block;margin-bottom:4px;font-weight:600}}
   .info-box .value{{font-size:1.3rem;font-weight:800;color:#0d4f3c;direction:ltr;display:block}}
-  .info-box.bus .value{{color:#e07b00;font-size:2rem}}
+  .info-box.supv{{border-color:#d4eee4;background:#f5fdf8;flex:2}}
+  .info-box.supv .value{{color:#1a7a5e;font-size:.82rem;direction:rtl;font-weight:700;line-height:1.35}}
   .info-box.mina .value{{font-size:1.15rem;color:#1a4a7a}}
   .group-banner{{background:linear-gradient(90deg,#e07b00,#f5a623);color:white;text-align:center;padding:8px;font-size:.82rem;font-weight:700}}
   .group-list{{padding:10px 14px}}
-  .group-member{{display:flex;align-items:center;gap:10px;padding:9px 6px;border-bottom:1px solid #f0f0f0}}
+  .group-member{{display:flex;align-items:center;gap:10px;padding:9px 6px;border-radius:8px;border-bottom:1px solid #f0f0f0}}
   .group-member:last-child{{border-bottom:none}}
+  .group-member.female{{background:#fff0f6}}
   .member-num{{width:26px;height:26px;border-radius:50%;background:#1a7a5e;color:white;font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}}
   .member-name{{font-size:.92rem;color:#1a1a1a;font-weight:500;flex:1}}
   .member-mina{{font-size:.72rem;color:#1a4a7a;font-weight:700;background:#eef4ff;border-radius:6px;padding:2px 7px;direction:ltr;white-space:nowrap}}
@@ -788,10 +836,11 @@ function onScan(t){{
 function showResult(p){{
   const grp=byResv[p.resv]||[p];
   const mina=p.mina?`<div class="info-box mina"><span class="label">سكن منى</span><span class="value">${{p.mina}}</span></div>`:'';
-  let h=`<div class="result-card"><div class="card-header"><div class="pilgrim-label">الحاج / الحاجة</div><div class="pilgrim-name">${{p.name}}</div></div><div class="card-body"><div class="info-box"><span class="label">رقم الحجز</span><span class="value" style="font-size:1.1rem">${{p.resv||'—'}}</span></div><div class="info-box bus"><span class="label">الباص</span><span class="value">${{p.bus||'—'}}</span></div>${{mina}}</div>`;
-  if(grp.length>1){{
-    h+=`<div class="group-banner">👥 رفقاء الحجز · ${{grp.length}} أشخاص</div><div class="group-list">`;
-    grp.forEach((mem,i)=>{{const s=mem.name===p.name;h+=`<div class="group-member" style="${{s?'background:#edfaf5':''}}"><div class="member-num">${{i+1}}</div><div class="member-name">${{mem.name}}${{s?' <b style="color:#1a7a5e">(أنت)</b>':''}}</div>${{mem.mina?`<span class="member-mina">${{mem.mina}}</span>`:''}}${{mem.phone?`<a class="wa-ic" href="${{waLink(mem.phone)}}" target="_blank" rel="noopener">${{WA_SVG}}</a>`:''}}</div>`;}});
+  let h=`<div class="result-card"><div class="card-header"><div class="pilgrim-label">الحاج / الحاجة</div><div class="pilgrim-name">${{p.name}}</div></div><div class="card-body"><div class="info-box"><span class="label">رقم الحجز</span><span class="value" style="font-size:1.1rem">${{p.resv||'—'}}</span></div><div class="info-box supv"><span class="label">المشرف</span><span class="value">${{p.supervisor||'—'}}</span></div>${{mina}}</div>`;
+  const othrs=grp.filter(m=>m.name!==p.name);
+  if(othrs.length>0){{
+    h+=`<div class="group-banner">👥 رفقاء الحجز · ${{othrs.length}} أشخاص</div><div class="group-list">`;
+    othrs.forEach((mem,mi)=>{{const isF=mem.gender==='أنثى';const gclr=isF?'#c0396e':'#1a7a5e';const gico=isF?'♀':'♂';h+=`<div class="group-member${{isF?' female':''}}"><div class="member-num" style="background:${{gclr}}">${{mi+1}}</div><div class="member-name">${{mem.name}}<span style="font-size:.65rem;margin-right:4px;color:${{gclr}};opacity:.75">${{gico}}</span></div>${{mem.mina?`<span class="member-mina">${{mem.mina}}</span>`:''}}${{mem.phone?`<a class="wa-ic" href="${{waLink(mem.phone)}}" target="_blank" rel="noopener">${{WA_SVG}}</a>`:''}}</div>`;}});
     h+='</div>';
   }}
   h+='</div><button class="rescan-btn" onclick="startScan()">📷 مسح باركود جديد</button>';
@@ -962,6 +1011,283 @@ initAuth();
 </html>"""
 
 # ════════════════════════════════
+# Supervisors directory — بحث بالمشرف / بالغرفة
+# ════════════════════════════════
+def make_supervisors(DECRYPT_JS, LOCK_HTML, H1, SEARCH_LINK, SWITCHER):
+    return f"""<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>دليل المشرفين</title>
+<style>
+  *{{box-sizing:border-box;margin:0;padding:0}}
+  body{{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:linear-gradient(135deg,#0d4f3c 0%,#1a7a5e 50%,#0d4f3c 100%);min-height:100vh;padding:0 0 50px}}
+  header{{background:rgba(0,0,0,.25);padding:16px 16px 14px;text-align:center;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.1)}}
+  .hdr-row{{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}}
+  header h1{{color:#f5d06e;font-size:1.15rem;font-weight:700}}
+  .nav-link{{background:rgba(255,255,255,.15);color:#f5d06e;border-radius:10px;padding:6px 11px;font-size:.78rem;font-weight:700;text-decoration:none;border:1px solid rgba(245,208,110,.3)}}
+  {SWITCH_CSS}
+  .mode-toggle{{display:flex;gap:8px;margin-top:12px}}
+  .mode-btn{{flex:1;padding:10px 8px;border-radius:12px;border:1.5px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:rgba(255,255,255,.85);font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s;text-align:center}}
+  .mode-btn.active{{background:#f5d06e;color:#0d4f3c;border-color:#f5d06e}}
+  .search-wrap{{position:relative;margin-top:10px}}
+  .search-wrap input{{width:100%;padding:13px 44px 13px 16px;border-radius:14px;border:none;font-size:1rem;font-family:inherit;background:rgba(255,255,255,.95);outline:none;direction:rtl}}
+  .search-icon{{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:1.1rem;pointer-events:none}}
+  .content{{max-width:520px;margin:16px auto 0;padding:0 14px}}
+  .count-info{{color:rgba(255,255,255,.6);font-size:.78rem;text-align:center;margin-bottom:10px}}
+  /* Supervisor card */
+  .supv-card{{background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.18);margin-bottom:12px;animation:fadeUp .2s ease}}
+  @keyframes fadeUp{{from{{opacity:0;transform:translateY(10px)}}to{{opacity:1;transform:translateY(0)}}}}
+  .supv-row{{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;transition:background .12s}}
+  .supv-row:active{{background:#f5f5f5}}
+  .supv-avatar{{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#1a7a5e,#0d4f3c);color:#f5d06e;font-size:1.1rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}}
+  .supv-info{{flex:1;min-width:0}}
+  .supv-name{{font-size:.95rem;font-weight:700;color:#0d4f3c;line-height:1.3}}
+  .supv-meta{{font-size:.72rem;color:#888;margin-top:3px}}
+  .supv-arrow{{color:#aaa;font-size:.75rem;flex-shrink:0}}
+  /* Rooms inside supervisor */
+  .supv-rooms{{background:#f8fffe;border-top:1px solid #e0f0ea;padding:10px 14px 12px}}
+  .room-item{{background:white;border-radius:10px;margin-bottom:8px;overflow:hidden;border:1px solid #e8f5f0;box-shadow:0 1px 4px rgba(0,0,0,.07)}}
+  .room-hdr{{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;transition:background .12s}}
+  .room-hdr:active{{background:#f5f5f5}}
+  .room-badge{{background:#e07b00;color:white;font-weight:800;font-size:.82rem;border-radius:8px;padding:3px 10px;direction:ltr;white-space:nowrap;flex-shrink:0}}
+  .room-cnt{{flex:1;font-size:.8rem;color:#555;font-weight:600}}
+  .room-arrow{{color:#bbb;font-size:.7rem;flex-shrink:0}}
+  .room-pils{{border-top:1px solid #f0f0f0}}
+  /* Floor grid (room mode) */
+  .floor-sec{{margin-bottom:20px}}
+  .floor-hdr{{color:rgba(255,255,255,.65);font-size:.72rem;font-weight:700;letter-spacing:.8px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.18)}}
+  .rooms-grid{{display:flex;flex-wrap:wrap;gap:8px}}
+  .room-tile{{background:#e07b00;color:white;font-weight:800;font-size:.9rem;border-radius:10px;padding:9px 13px;cursor:pointer;transition:transform .1s,background .1s;direction:ltr;-webkit-tap-highlight-color:transparent;user-select:none}}
+  .room-tile:active{{transform:scale(.91)}}
+  .room-tile.sel{{background:#0d4f3c;box-shadow:0 0 0 3px #f5d06e}}
+  .ric{{background:white;border-radius:14px;padding:14px 16px;margin-top:10px;animation:fadeUp .15s ease;box-shadow:0 2px 12px rgba(0,0,0,.18)}}
+  .ric-title{{font-size:.72rem;color:#888;font-weight:600;margin-bottom:10px}}
+  .ric-supvs{{display:flex;flex-wrap:wrap;gap:8px}}
+  .ric-supv{{background:#e8f4ee;color:#0d4f3c;font-size:.9rem;font-weight:700;padding:7px 14px;border-radius:10px}}
+  /* Pilgrim rows inside rooms */
+  .pil-list{{padding:6px 10px 8px}}
+  .pil-row{{display:flex;align-items:center;gap:9px;padding:7px 4px;border-radius:8px;border-bottom:1px solid #f5f5f5}}
+  .pil-row:last-child{{border-bottom:none}}
+  .pil-row.female{{background:#fff0f6}}
+  .pil-num{{width:22px;height:22px;border-radius:50%;color:white;font-size:.68rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}}
+  .pil-name{{flex:1;font-size:.85rem;color:#1a1a1a;font-weight:500;line-height:1.3}}
+  .pil-meta{{font-size:.72rem;color:#1a4a7a;font-weight:700;background:#eef4ff;border-radius:5px;padding:2px 7px;direction:ltr;white-space:nowrap}}
+  .wa-mini{{display:inline-flex;width:28px;height:28px;background:#25D366;border-radius:7px;align-items:center;justify-content:center;flex-shrink:0;text-decoration:none}}
+  .wa-mini svg{{width:16px;height:16px;fill:#fff}}
+  .gender-tag{{font-size:.65rem;margin-right:3px;opacity:.7}}
+  /* Stats bar */
+  .stats-bar{{display:flex;gap:8px;margin-bottom:14px}}
+  .stat-chip{{flex:1;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:8px 6px;text-align:center}}
+  .stat-n{{font-size:1.3rem;font-weight:800;color:#f5d06e}}
+  .stat-l{{font-size:.65rem;color:rgba(255,255,255,.65);margin-top:2px}}
+  .no-result{{text-align:center;margin-top:60px;color:rgba(255,255,255,.8)}}
+  .no-result .icon{{font-size:3rem;display:block;margin-bottom:10px}}
+  {LOCK_CSS}
+</style>
+</head>
+<body>
+{LOCK_HTML}
+<header>
+  {SWITCHER}
+  <div class="hdr-row">
+    <h1>👥 {H1}</h1>
+    <a href="{SEARCH_LINK}" class="nav-link">🔍 بحث</a>
+  </div>
+  <div class="mode-toggle">
+    <button class="mode-btn active" id="mSupv" onclick="setMode('supv')">👤 المشرفون</button>
+    <button class="mode-btn" id="mRoom" onclick="setMode('room')">🏠 الغرف</button>
+  </div>
+  <div class="search-wrap">
+    <input type="search" id="searchInput" placeholder="ابحث باسم المشرف..." autocomplete="off" autocorrect="off" spellcheck="false">
+    <span class="search-icon">🔍</span>
+  </div>
+</header>
+<div class="content">
+  <div class="stats-bar" id="statsBar" style="display:none">
+    <div class="stat-chip"><div class="stat-n" id="sTot">—</div><div class="stat-l">إجمالي الحجاج</div></div>
+    <div class="stat-chip"><div class="stat-n" id="sSupv">—</div><div class="stat-l">مشرف</div></div>
+    <div class="stat-chip"><div class="stat-n" id="sRooms">—</div><div class="stat-l">غرفة</div></div>
+  </div>
+  <div id="results"></div>
+</div>
+<script>
+{WA_JS}
+let DATA=[];
+const bySupv={{}};  // name → {{total,male,female,rooms:{{roomNum:[pilgrims]}}}}
+const byRoom={{}};  // roomNum → {{supervisor,pilgrims}}
+let supvNames=[];
+let _mode='supv';
+let _openSupv=-1;
+let _openRoom='';
+let _openRoomSub='';
+
+// Strip leading section prefix: "1-615" → "615", "14-411" → "411", "615" → "615"
+function roomKey(mina){{
+  if(!mina||mina==='—')return mina||'—';
+  const parts=mina.split('-');
+  return parts[parts.length-1];
+}}
+
+function onDataReady(d){{
+  DATA=d;
+  d.forEach(p=>{{
+    const sv=p.supervisor||'غير محدد';
+    const rm=roomKey(p.mina);
+    if(!bySupv[sv])bySupv[sv]={{total:0,male:0,female:0,rooms:{{}}}};
+    const s=bySupv[sv];
+    s.total++;
+    if(p.gender==='ذكر')s.male++;else if(p.gender==='أنثى')s.female++;
+    if(!s.rooms[rm])s.rooms[rm]=[];
+    s.rooms[rm].push(p);
+    if(!byRoom[rm])byRoom[rm]={{supervisor:sv,pilgrims:[]}};
+    byRoom[rm].pilgrims.push(p);
+  }});
+  supvNames=Object.keys(bySupv).sort();
+  const totalRooms=Object.keys(byRoom).length;
+  document.getElementById('sTot').textContent=d.length;
+  document.getElementById('sSupv').textContent=supvNames.length;
+  document.getElementById('sRooms').textContent=totalRooms;
+  document.getElementById('statsBar').style.display='flex';
+  render('');
+}}
+
+const inp=()=>document.getElementById('searchInput');
+window.addEventListener('DOMContentLoaded',()=>{{
+  inp().addEventListener('input',()=>render(inp().value.trim()));
+}});
+
+function setMode(m){{
+  _mode=m;_openSupv=-1;_openRoom='';_openRoomSub='';
+  inp().value='';
+  document.getElementById('mSupv').classList.toggle('active',m==='supv');
+  document.getElementById('mRoom').classList.toggle('active',m==='room');
+  inp().placeholder=m==='supv'?'ابحث باسم المشرف...':'ابحث برقم الغرفة...';
+  render('');
+}}
+
+function render(q){{
+  const div=document.getElementById('results');
+  if(!supvNames.length)return;
+  if(_mode==='supv') renderSupv(q,div);
+  else renderRooms(q,div);
+}}
+
+function renderSupv(q,div){{
+  const list=q?supvNames.filter(n=>n.includes(q)):supvNames;
+  if(!list.length){{div.innerHTML=NO_RES;return;}}
+  let html=`<div class="count-info">${{list.length}} مشرف</div>`;
+  list.forEach((sv,idx)=>{{
+    const info=bySupv[sv];
+    const isOpen=_openSupv===idx;
+    const roomKeys=Object.keys(info.rooms).sort((a,b)=>a.localeCompare(b,undefined,{{numeric:true}}));
+    html+=`<div class="supv-card">
+      <div class="supv-row" onclick="toggleSupv(${{idx}})">
+        <div class="supv-avatar">${{sv.charAt(0)}}</div>
+        <div class="supv-info">
+          <div class="supv-name">${{sv}}</div>
+          <div class="supv-meta">${{info.total}} حاج &nbsp;·&nbsp; ${{roomKeys.length}} غرفة &nbsp;·&nbsp; <span style="color:#1a7a5e">♂${{info.male}}</span> <span style="color:#c0396e">♀${{info.female}}</span></div>
+        </div>
+        <div class="supv-arrow">${{isOpen?'▲':'▼'}}</div>
+      </div>`;
+    if(isOpen){{
+      html+=`<div class="supv-rooms">`;
+      roomKeys.forEach(rm=>{{
+        const pils=info.rooms[rm];
+        const subOpen=_openRoomSub===sv+'|'+rm;
+        html+=`<div class="room-item">
+          <div class="room-hdr" onclick="toggleRoomSub('${{encodeURIComponent(sv+'|'+rm)}}')">
+            <span class="room-badge">${{rm}}</span>
+            <span class="room-cnt">${{pils.length}} حاج</span>
+            <span class="room-arrow">${{subOpen?'▲':'▼'}}</span>
+          </div>`;
+        if(subOpen){{
+          html+=`<div class="room-pils"><div class="pil-list">`;
+          pils.forEach((p,i)=>{{
+            const isF=p.gender==='أنثى';const gc=isF?'#c0396e':'#1a7a5e';
+            html+=`<div class="pil-row${{isF?' female':''}}">
+              <span class="pil-num" style="background:${{gc}}">${{i+1}}</span>
+              <span class="pil-name">${{p.name}}<span class="gender-tag" style="color:${{gc}}">${{isF?'♀':'♂'}}</span></span>
+              ${{p.phone?`<a class="wa-mini" href="${{waLink(p.phone)}}" target="_blank" rel="noopener">${{WA_SVG}}</a>`:''}}
+            </div>`;
+          }});
+          html+=`</div></div>`;
+        }}
+        html+=`</div>`;
+      }});
+      html+=`</div>`;
+    }}
+    html+=`</div>`;
+  }});
+  div.innerHTML=html;
+}}
+
+function shortName(n){{
+  const p=n.trim().split(/\s+/).filter(Boolean);
+  return p.length<=2?n:p[0]+' '+p[p.length-1];
+}}
+function floorOf(rm){{
+  const n=parseInt(rm);
+  if(isNaN(n))return'أخرى';
+  const d=Math.floor(n/100);
+  const ar=['','الدور الأول','الدور الثاني','الدور الثالث','الدور الرابع','الدور الخامس',
+            'الدور السادس','الدور السابع','الدور الثامن','الدور التاسع','الدور العاشر'];
+  return ar[d]||('الدور '+d);
+}}
+
+function renderRooms(q,div){{
+  const allRooms=Object.keys(byRoom).filter(r=>!q||r.includes(q));
+  allRooms.sort((a,b)=>{{const na=parseInt(a),nb=parseInt(b);return(isNaN(na)||isNaN(nb))?a.localeCompare(b):na-nb;}});
+  if(!allRooms.length){{div.innerHTML=NO_RES;return;}}
+  // group by floor
+  const floors={{}};
+  allRooms.forEach(rm=>{{const f=floorOf(rm);if(!floors[f])floors[f]=[];floors[f].push(rm);}});
+  const floorOrder=Object.keys(floors).sort((a,b)=>{{
+    if(a==='أخرى')return 1;if(b==='أخرى')return -1;
+    return parseInt(floors[a][0])-parseInt(floors[b][0]);
+  }});
+  let html=`<div class="count-info">${{allRooms.length}} غرفة</div>`;
+  floorOrder.forEach(floor=>{{
+    const rms=floors[floor];
+    html+=`<div class="floor-sec"><div class="floor-hdr">${{floor}}</div><div class="rooms-grid">`;
+    rms.forEach(rm=>{{
+      html+=`<div class="room-tile${{_openRoom===rm?' sel':''}}" onclick="selectRoom('${{encodeURIComponent(rm)}}')">${{rm}}</div>`;
+    }});
+    html+=`</div>`;
+    if(_openRoom&&rms.includes(_openRoom)){{
+      const info=byRoom[_openRoom];
+      const supvs=[...new Set(info.pilgrims.map(p=>p.supervisor||'غير محدد'))];
+      const mC=info.pilgrims.filter(p=>p.gender==='ذكر').length;
+      const fC=info.pilgrims.filter(p=>p.gender==='أنثى').length;
+      html+=`<div class="ric">
+        <div class="ric-title">غرفة ${{_openRoom}} &nbsp;·&nbsp; ${{info.pilgrims.length}} حاج &nbsp;·&nbsp; <span style="color:#1a7a5e">♂${{mC}}</span> <span style="color:#c0396e">♀${{fC}}</span></div>
+        <div class="ric-supvs">`;
+      supvs.forEach(sv=>{{html+=`<div class="ric-supv">${{shortName(sv)}}</div>`;}});
+      html+=`</div></div>`;
+    }}
+    html+=`</div>`;
+  }});
+  div.innerHTML=html;
+}}
+
+function selectRoom(rmEnc){{
+  const rm=decodeURIComponent(rmEnc);
+  _openRoom=_openRoom===rm?'':rm;
+  render(inp().value.trim());
+  if(_openRoom)setTimeout(()=>{{const el=document.querySelector('.ric');if(el)el.scrollIntoView({{behavior:'smooth',block:'nearest'}});}},60);
+}}
+function toggleSupv(idx){{_openSupv=_openSupv===idx?-1:idx;_openRoomSub='';render(inp().value.trim());}}
+function toggleRoomSub(enc){{const key=decodeURIComponent(enc);_openRoomSub=_openRoomSub===key?'':key;render(inp().value.trim());}}
+
+const NO_RES='<div class="no-result"><span class="icon">🔍</span><p>لا توجد نتائج</p></div>';
+{DECRYPT_JS}
+initAuth();
+</script>
+</body>
+</html>"""
+
+# ════════════════════════════════
 # Landing page (home) — public; two campaigns, each with بحث + بيان الإركاب
 # ════════════════════════════════
 def make_landing(campaigns):
@@ -974,6 +1300,7 @@ def make_landing(campaigns):
             '<a href="'+c['search_out']+'" class="camp-act"><span class="ca-ic">🔍</span><span>بحث الحجاج</span></a>'
             '<a href="'+c['dash_out']+'" class="camp-act"><span class="ca-ic">📊</span><span>لوحة التحكم</span></a>'
             '<a href="'+c['manifest_out']+'" class="camp-act"><span class="ca-ic">📋</span><span>بيان الإركاب</span></a>'
+            '<a href="'+c['supv_out']+'" class="camp-act" style="grid-column:1/-1"><span class="ca-ic">👥</span><span>دليل المشرفين</span></a>'
             '</div></div>')
     return ('<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8">'
         '<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">'
@@ -997,7 +1324,7 @@ def make_landing(campaigns):
         '.foot{margin-top:30px;color:rgba(255,255,255,.4);font-size:.72rem}'
         '</style></head><body>'
         '<div class="home-head"><span class="k">🕋</span><h1>حملات الحج</h1>'
-        '<div class="ver-badge">v2.2</div>'
+        '<div class="ver-badge">v3.1</div>'
         '<p>اختر الحملة والخدمة</p>'
         '<div class="upd-date">آخر تحديث للبيانات: '+__import__('datetime').datetime.now().strftime('%d/%m/%Y')+'</div>'
         '</div>'
@@ -1012,7 +1339,7 @@ CAMPAIGNS = [
     {   'key':'muhaimeed',
         'data':f'{BASE}/pilgrims_data.json', 'form':f'{BASE}/Form A4.png',
         'search_out':'muhaimeed.html', 'manifest_out':'manifest.html', 'card_out':'card.html', 'company':'شركة المحيميد للحج', 'scan_out':'scan.html',
-        'dash_out':'dashboard.html',
+        'dash_out':'dashboard.html', 'supv_out':'supervisors.html',
         'h1':'بحث حجاج يسر مساند', 'brand':'يسر مساند',
         'manifest_title':'بيانات الركاب — المحيميد للحج',
         'card_co':'يسر مساند', 'card_foot':'الحملة المحيمد للحج والعمرة',
@@ -1026,7 +1353,7 @@ CAMPAIGNS = [
     {   'key':'ruwais',
         'data':f'{BASE}/ruwais_data.json', 'form':f'{BASE}/Form A4 R.png',
         'search_out':'ruwais.html', 'manifest_out':'ruwais-manifest.html', 'card_out':'ruwais-card.html', 'company':'شركة الرويس للحج', 'scan_out':'ruwais-scan.html',
-        'dash_out':'ruwais-dashboard.html',
+        'dash_out':'ruwais-dashboard.html', 'supv_out':'ruwais-supervisors.html',
         'h1':'بحث حجاج الرويس', 'brand':'حملة الرويس',
         'manifest_title':'بيانات الركاب — الرويس',
         'card_co':'حملة الرويس', 'card_foot':'حملة الرويس للحج والعمرة',
@@ -1059,7 +1386,7 @@ for c in CAMPAIGNS:
     def addpwa(h):
         return h.replace('</head>', HEAD+'\n</head>', 1).replace('</body>', SW_REG+'\n</body>', 1)
     # search
-    idx = apply_theme(make_index(make_decrypt_js(ps), LH_SEARCH, c['h1'], c['manifest_out'], c['qr'], c['card_out'], switcher(c['key']), reports_js(c['reports_key'], c['reports_out']), c['reports_out'], c['scan_out'], c['dash_out']), c['theme'])
+    idx = apply_theme(make_index(make_decrypt_js(ps), LH_SEARCH, c['h1'], c['manifest_out'], c['qr'], c['card_out'], switcher(c['key']), reports_js(c['reports_key'], c['reports_out']), c['reports_out'], c['scan_out'], c['dash_out'], c['supv_out']), c['theme'])
     open(f"{BASE}/{c['search_out']}",'w',encoding='utf-8').write(addpwa(idx))
     # reports page
     rpt = apply_theme(make_reports(c['reports_key'], c['search_out'], switcher(c['key'])), c['theme'])
@@ -1078,7 +1405,12 @@ for c in CAMPAIGNS:
     # card
     card = apply_theme(CARD.replace('__CO__', c['card_co']).replace('__FOOTER__', c['card_foot']), c['theme'])
     open(f"{BASE}/{c['card_out']}",'w',encoding='utf-8').write(card)
-    outputs += [c['search_out'], c['manifest_out'], c['card_out'], c['reports_out'], c['scan_out'], c['dash_out'],
+    # supervisors directory
+    LH_SUPV = _lh.replace('__PAGETYPE__', 'دليل المشرفين')
+    supv = apply_theme(make_supervisors(make_decrypt_js(ps), LH_SUPV, 'دليل المشرفين', c['search_out'], switcher(c['key'])), c['theme'])
+    open(f"{BASE}/{c['supv_out']}",'w',encoding='utf-8').write(addpwa(supv))
+    print(f"  {c['supv_out']}: built ({c['key']})")
+    outputs += [c['search_out'], c['manifest_out'], c['card_out'], c['reports_out'], c['scan_out'], c['dash_out'], c['supv_out'],
                 c['webmanifest'], f"{c['icon_prefix']}-192.png", f"{c['icon_prefix']}-512.png", f"{c['icon_prefix']}-180.png"]
     # clean check — no plaintext PII fields leaked
     for fn in (c['search_out'], c['manifest_out']):
