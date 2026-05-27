@@ -1521,14 +1521,6 @@ function doExport(){{
   }});
   if(!out.length){{alert('لا يوجد أرقام محددة');return;}}
   let vcf='';
-  // بطاقة عنوان تضحوية بجوال وهمي — iOS يحتاج TEL ليعتبرها بطاقة صالحة
-  const hdrLabel='📋 47 '+shortName(sv)+' ('+out.length+')';
-  vcf+='BEGIN:VCARD\\r\\n';
-  vcf+='VERSION:3.0\\r\\n';
-  vcf+='FN:'+hdrLabel+'\\r\\n';
-  vcf+='N:;'+shortName(sv)+';;;\\r\\n';
-  vcf+='TEL;TYPE=CELL:+966000000000\\r\\n';
-  vcf+='END:VCARD\\r\\n';
   out.forEach((c,i)=>{{
     const fn='47 '+c.name;
     // تنظيف $ و | من N (يبقى في FN للعرض)
