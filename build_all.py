@@ -375,7 +375,8 @@ def make_index(DECRYPT_JS, LOCK_HTML, H1, NAV, QR, CARDFILE, SWITCHER, REPORTS_J
   .scan-title{{color:#f5d06e;font-size:1rem;font-weight:700}}
   .scan-counter{{background:rgba(245,208,110,.2);color:#f5d06e;border-radius:20px;padding:3px 12px;font-size:.78rem;font-weight:700;border:1px solid rgba(245,208,110,.35)}}
   .scan-close{{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:white;border-radius:10px;padding:7px 12px;font-size:.82rem;font-weight:700;cursor:pointer;font-family:inherit}}
-  #scanReader{{border-radius:14px;overflow:hidden;border:2.5px solid rgba(245,208,110,.5);background:#111;width:100%;max-width:480px;max-height:200px}}
+  #scanReader{{border-radius:14px;overflow:hidden;border:2.5px solid rgba(245,208,110,.5);background:#111;width:100%;max-width:480px}}
+  #scanReader video{{width:100%!important;height:auto!important;display:block;object-fit:cover}}
   #scanHint{{color:rgba(255,255,255,.6);font-size:.78rem;margin-top:6px;text-align:center;line-height:1.5;min-height:1.6em}}
   .scan-list{{width:100%;max-width:480px;flex:1;overflow-y:auto;margin-top:10px;padding-bottom:20px}}
   .scan-item{{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px 12px;margin-bottom:7px;animation:fadeUp .15s ease}}
@@ -520,7 +521,7 @@ function openScan(){{
   if(typeof Html5Qrcode==='undefined'){{document.getElementById('scanHint').innerHTML='⚠️ تعذّر تحميل أداة المسح';return;}}
   if(!_h5)_h5=new Html5Qrcode('scanReader');
   if(_scanning)return;
-  _h5.start({{facingMode:'environment'}},{{fps:10,qrbox:{{width:220,height:220}}}},_onScan,()=>{{}})
+  _h5.start({{facingMode:'environment'}},{{fps:15,qrbox:(w,h)=>{{const m=Math.floor(Math.min(w,h)*0.85);return{{width:m,height:m}};}}}},_onScan,()=>{{}})
     .then(()=>{{_scanning=true;}})
     .catch(e=>{{document.getElementById('scanHint').innerHTML='⚠️ يحتاج إذن الكاميرا<br><small>'+e+'</small>';}});
 }}
@@ -528,13 +529,38 @@ function closeScan(){{
   document.getElementById('scanModal').classList.remove('open');
   if(_h5&&_scanning){{_h5.stop().catch(()=>{{}});_scanning=false;}}
 }}
-function _findId(t){{
-  if(byId[t])return t;
-  const d=(t||'').replace(/\\D/g,'');
-  if(byId[d])return d;
-  const m=(t||'').match(/\\d{{10}}/);
-  if(m&&byId[m[0]])return m[0];
-  return d;
+function _findHit(t){{
+  if(!t)return null;
+  // 1) direct ID lookup
+  if(byId[t])return byId[t];
+  // 2) digits only
+  const d=t.replace(/\\D/g,'');
+  if(byId[d])return byId[d];
+  // 3) any 10-digit sequence in the text
+  const all=(t.match(/\\d{{10}}/g))||[];
+  for(const x of all){{if(byId[x])return byId[x];}}
+  // 4) our own card.html URL → decode group JSON → match by name
+  if(t.includes('card.html')||t.includes('?b=')){{
+    try{{
+      const qIdx=t.indexOf('?');
+      if(qIdx>=0){{
+        const sp=new URLSearchParams(t.slice(qIdx+1));
+        const g=sp.get('g');
+        if(g){{
+          const bytes=Uint8Array.from(atob(decodeURIComponent(g)),c=>c.charCodeAt(0));
+          const grp=JSON.parse(new TextDecoder().decode(bytes));
+          if(grp&&grp[0]&&grp[0].name){{
+            const nm=norm(grp[0].name);
+            const hit=DATA.find(p=>norm(p.name)===nm);
+            if(hit)return[hit];
+          }}
+        }}
+      }}
+    }}catch(e){{}}
+  }}
+  // 5) phone number fallback
+  if(byPhone[d])return byPhone[d];
+  return null;
 }}
 function _goDetail(id){{
   closeScan();
@@ -553,18 +579,22 @@ function _renderScanList(){{
     </div>`).join('');
 }}
 function _onScan(t){{
-  const id=_findId(t);
-  if(id===_lastScanId)return;  // ignore same card re-read
-  _lastScanId=id;
-  setTimeout(()=>{{_lastScanId='';}},2500);  // cooldown 2.5s per card
-  const hits=byId[id];
-  if(!hits||!hits.length){{document.getElementById('scanHint').textContent='❌ غير مسجّل: '+id;return;}}
-  if(_scanIds.has(id)){{document.getElementById('scanHint').textContent='⚠️ تم مسحه مسبقاً';return;}}
+  if(t===_lastScanId)return;  // ignore same raw content re-read
+  _lastScanId=t;
+  setTimeout(()=>{{if(_lastScanId===t)_lastScanId='';}},2500);
+  const hits=_findHit(t);
+  if(!hits||!hits.length){{
+    const preview=(t||'').slice(0,80);
+    document.getElementById('scanHint').innerHTML='❌ غير معروف<br><small style="opacity:.55;word-break:break-all;direction:ltr;display:inline-block">'+preview+'</small>';
+    return;
+  }}
+  const p=hits[0];
+  if(_scanIds.has(p.id)){{document.getElementById('scanHint').textContent='⚠️ تم مسحه مسبقاً: '+p.name;return;}}
   if(navigator.vibrate)navigator.vibrate(80);
-  _scanIds.add(id);
-  _scanList.unshift(hits[0]);
+  _scanIds.add(p.id);
+  _scanList.unshift(p);
   document.getElementById('scanCounter').textContent=_scanList.length+' حاج';
-  document.getElementById('scanHint').textContent='✅ '+hits[0].name;
+  document.getElementById('scanHint').textContent='✅ '+p.name;
   _renderScanList();
 }}
 initAuth();
@@ -1249,7 +1279,7 @@ def make_landing(campaigns):
         '.foot{margin-top:30px;color:rgba(255,255,255,.4);font-size:.72rem}'
         '</style></head><body>'
         '<div class="home-head"><span class="k">🕋</span><h1>حملات الحج</h1>'
-        '<div class="ver-badge">v3.2</div>'
+        '<div class="ver-badge">v3.3</div>'
         '<p>اختر الحملة والخدمة</p>'
         '<div class="upd-date">آخر تحديث للبيانات: '+__import__('datetime').datetime.now().strftime('%d/%m/%Y')+'</div>'
         '</div>'
