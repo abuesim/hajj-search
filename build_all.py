@@ -1506,18 +1506,19 @@ function doExport(){{
   }});
   if(!out.length){{alert('لا يوجد أرقام محددة');return;}}
   let vcf='';
-  // بطاقة العنوان (iOS يسقط أول vCard)
+  // بطاقة عنوان تضحوية بجوال وهمي — iOS يحتاج TEL ليعتبرها بطاقة صالحة
   const hdrLabel='📋 47 | '+shortName(sv)+' ('+out.length+')';
   vcf+='BEGIN:VCARD\\r\\n';
   vcf+='VERSION:3.0\\r\\n';
   vcf+='FN:'+hdrLabel+'\\r\\n';
   vcf+='N:;'+shortName(sv)+';;;\\r\\n';
+  vcf+='TEL;TYPE=CELL:+966000000000\\r\\n';
   vcf+='END:VCARD\\r\\n';
   out.forEach((c,i)=>{{
     const fn='47 | '+c.name;
-    // تنظيف $ و | من N لتجنب عطل ترتيب الأسماء في iOS، مع إبقائها في FN
+    // تنظيف $ و | من N (يبقى في FN للعرض)
     const cleanName=c.name.replace(/[\\$\\|]/g,'').trim();
-    // تحويل 00 → + (صيغة E.164 يفضّلها iOS وواتساب)
+    // 00 → + (صيغة E.164)
     let phoneFormatted=c.phone;
     if(phoneFormatted.startsWith('00'))phoneFormatted=phoneFormatted.replace(/^00/,'+');
     vcf+='BEGIN:VCARD\\r\\n';
@@ -1529,10 +1530,16 @@ function doExport(){{
   }});
   const safe=shortName(sv).replace(/\\s+/g,'_').replace(/[^\\u0600-\\u06FF\\w_]/g,'');
   const fname='حجاج_'+safe+'.vcf';
-  const blob=new Blob([vcf],{{type:'text/vcard;charset=utf-8'}});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download=fname;document.body.appendChild(a);a.click();document.body.removeChild(a);
-  setTimeout(()=>URL.revokeObjectURL(url),1500);
+  // File + Web Share API: يفتح Sheet المشاركة في iOS — يضيف للجهات مباشرة
+  const file=new File(["\\uFEFF"+vcf],fname,{{type:'text/vcard;charset=utf-8'}});
+  if(navigator.share&&navigator.canShare&&navigator.canShare({{files:[file]}})){{
+    navigator.share({{files:[file],title:'تصدير جهات الاتصال'}}).catch(()=>{{}});
+  }}else{{
+    // fallback: تنزيل تقليدي (للديسكتوب وأندرويد القديم)
+    const url=URL.createObjectURL(file);
+    const a=document.createElement('a');a.href=url;a.download=fname;document.body.appendChild(a);a.click();document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url),1500);
+  }}
 }}
 function norm(s){{return(s||'').replace(/[أإآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').toLowerCase().trim()}}
 
