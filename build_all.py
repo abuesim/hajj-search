@@ -997,7 +997,7 @@ def make_landing(campaigns):
         '.foot{margin-top:30px;color:rgba(255,255,255,.4);font-size:.72rem}'
         '</style></head><body>'
         '<div class="home-head"><span class="k">🕋</span><h1>حملات الحج</h1>'
-        '<div class="ver-badge">v2.1</div>'
+        '<div class="ver-badge">v2.2</div>'
         '<p>اختر الحملة والخدمة</p>'
         '<div class="upd-date">آخر تحديث للبيانات: '+__import__('datetime').datetime.now().strftime('%d/%m/%Y')+'</div>'
         '</div>'
