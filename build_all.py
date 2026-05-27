@@ -7,7 +7,7 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
-BASE = '/Users/m/Documents/est3lam'
+BASE = os.path.dirname(os.path.abspath(__file__))
 import re, subprocess, sys
 import gen_manifest
 PASSWORD_SEARCH   = b'112233'
