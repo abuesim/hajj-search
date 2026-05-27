@@ -1506,25 +1506,31 @@ function doExport(){{
   }});
   if(!out.length){{alert('لا يوجد أرقام محددة');return;}}
   let vcf='';
-  // Sacrificial header card — iOS skips the first vCard; this label gets dropped instead
+  // بطاقة العنوان (iOS يسقط أول vCard)
   const hdrLabel='📋 47 | '+shortName(sv)+' ('+out.length+')';
   vcf+='BEGIN:VCARD\\r\\n';
   vcf+='VERSION:3.0\\r\\n';
   vcf+='FN:'+hdrLabel+'\\r\\n';
-  vcf+='N:;'+hdrLabel+';;;\\r\\n';
+  vcf+='N:;'+shortName(sv)+';;;\\r\\n';
   vcf+='END:VCARD\\r\\n';
   out.forEach((c,i)=>{{
     const fn='47 | '+c.name;
+    // تنظيف $ و | من N لتجنب عطل ترتيب الأسماء في iOS، مع إبقائها في FN
+    const cleanName=c.name.replace(/[\\$\\|]/g,'').trim();
+    // تحويل 00 → + (صيغة E.164 يفضّلها iOS وواتساب)
+    let phoneFormatted=c.phone;
+    if(phoneFormatted.startsWith('00'))phoneFormatted=phoneFormatted.replace(/^00/,'+');
     vcf+='BEGIN:VCARD\\r\\n';
     vcf+='VERSION:3.0\\r\\n';
     vcf+='FN:'+fn+'\\r\\n';
-    vcf+='N:;'+fn+';;;\\r\\n';
-    vcf+='TEL;TYPE=CELL:'+c.phone+'\\r\\n';
+    vcf+='N:;'+cleanName+';;;\\r\\n';
+    vcf+='TEL;TYPE=CELL:'+phoneFormatted+'\\r\\n';
     vcf+='END:VCARD\\r\\n';
   }});
   const safe=shortName(sv).replace(/\\s+/g,'_').replace(/[^\\u0600-\\u06FF\\w_]/g,'');
   const fname='حجاج_'+safe+'.vcf';
-  const blob=new Blob([vcf],{{type:'text/vcard;charset=utf-8'}});
+  // UTF-8 BOM لإجبار iOS على قراءة العربي بشكل صحيح
+  const blob=new Blob(["\\uFEFF"+vcf],{{type:'text/vcard;charset=utf-8'}});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');a.href=url;a.download=fname;document.body.appendChild(a);a.click();document.body.removeChild(a);
   setTimeout(()=>URL.revokeObjectURL(url),1500);
