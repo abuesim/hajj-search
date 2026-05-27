@@ -1043,6 +1043,24 @@ def make_supervisors(DECRYPT_JS, LOCK_HTML, H1, SEARCH_LINK, SWITCHER):
   .exp-row.disabled .exp-name{{color:#888}}
   .exp-phone{{font-size:.74rem;color:#888;direction:ltr;text-align:right;margin-top:3px;font-family:'Courier New',monospace}}
   .exp-mark{{color:#0d4f3c;font-weight:800;margin-left:3px}}
+  .exp-row.female{{background:#fff0f6}}
+  .exp-row.female.checked{{background:#ffe0ec}}
+  .exp-fam-chev{{background:rgba(224,123,0,.12);color:#e07b00;border:1px solid rgba(224,123,0,.3);border-radius:8px;padding:6px 9px;font-size:.72rem;font-weight:800;cursor:pointer;font-family:inherit;flex-shrink:0;line-height:1;white-space:nowrap}}
+  .exp-fam-chev.open{{background:#e07b00;color:white;border-color:#e07b00}}
+  .exp-fam-chev:active{{transform:scale(.93)}}
+  .exp-sub{{background:rgba(245,208,110,.08);border:1px solid rgba(245,208,110,.22);border-radius:11px;margin:-2px 4px 8px;padding:8px 8px}}
+  .exp-sub-ttl{{color:#f5d06e;font-size:.7rem;font-weight:700;padding:2px 6px 8px;letter-spacing:.5px}}
+  .exp-sub-row{{display:flex;align-items:center;gap:10px;background:white;border-radius:9px;padding:8px 10px;margin-bottom:5px;cursor:pointer;transition:.1s}}
+  .exp-sub-row:last-child{{margin-bottom:0}}
+  .exp-sub-row.checked{{background:#e8f5ee}}
+  .exp-sub-row.female{{background:#fff0f6}}
+  .exp-sub-row.female.checked{{background:#ffe0ec}}
+  .exp-sub-row.no-phone{{opacity:.55;cursor:not-allowed}}
+  .exp-sub-check{{width:20px;height:20px;border-radius:5px;background:white;border:2px solid #ccc;display:flex;align-items:center;justify-content:center;font-weight:800;color:#0d4f3c;flex-shrink:0;font-size:.75rem;line-height:1}}
+  .exp-sub-row.checked .exp-sub-check{{background:#0d4f3c;border-color:#0d4f3c;color:white}}
+  .exp-sub-row.no-phone .exp-sub-check{{background:#e5e5e5;border-color:#bbb;color:#999}}
+  .exp-sub-name{{flex:1;font-size:.86rem;color:#333;font-weight:600;line-height:1.3}}
+  .exp-sub-phone{{font-size:.7rem;color:#888;direction:ltr;font-family:'Courier New',monospace;margin-top:2px}}
   /* Pilgrim rows inside rooms */
   .pil-list{{padding:6px 10px 8px}}
   .pil-row{{display:flex;align-items:center;gap:9px;padding:7px 4px;border-radius:8px;border-bottom:1px solid #f5f5f5}}
@@ -1102,7 +1120,8 @@ let _openSupv=-1;
 let _openRoom='';
 let _openRoomSub='';
 let _expSupv=-1;
-let _expUnchecked=new Set();
+let _expState=new Map();  // key → bool (overrides default selection)
+let _expOpenFams=new Set();  // resv numbers expanded
 
 // Strip leading section prefix: "1-615" → "615", "14-411" → "411", "615" → "615"
 function roomKey(mina){{
@@ -1141,7 +1160,7 @@ window.addEventListener('DOMContentLoaded',()=>{{
 }});
 
 function setMode(m){{
-  _mode=m;_openSupv=-1;_openRoom='';_openRoomSub='';_expSupv=-1;_expUnchecked=new Set();
+  _mode=m;_openSupv=-1;_openRoom='';_openRoomSub='';_expSupv=-1;_expState=new Map();_expOpenFams=new Set();
   inp().value='';
   document.getElementById('mSupv').classList.toggle('active',m==='supv');
   document.getElementById('mRoom').classList.toggle('active',m==='room');
@@ -1278,7 +1297,12 @@ function hasFemaleInResv(p){{
   const grp=byResv[p.resv]||[];
   return grp.some(m=>m.gender==='أنثى');
 }}
-function supvPilgrims(svIdx){{
+function expKey(p){{return p.id||p.name;}}
+function isSel(key,defOn){{return _expState.has(key)?_expState.get(key):defOn;}}
+function togSel(key,defOn){{_expState.set(key,!isSel(key,defOn));}}
+function effPhone(m,head){{return normPhone(m.phone)||(head?normPhone(head.phone):'');}}
+
+function buildExportEntries(svIdx){{
   const sv=supvNames[svIdx];
   const info=bySupv[sv];
   const all=[];
@@ -1288,14 +1312,38 @@ function supvPilgrims(svIdx){{
     if(ra!==rb)return ra-rb;
     return(a.name||'').localeCompare(b.name||'','ar');
   }});
-  // dedupe by normalized phone (keep first)
-  const seen=new Set();
-  return all.filter(p=>{{
+  // mark resv numbers that have a $ head
+  const famResvs=new Set();
+  all.forEach(p=>{{if(hasFemaleInResv(p))famResvs.add(p.resv);}});
+  const entries=[];
+  const seenResv=new Set();
+  const seenPh=new Set();
+  for(const p of all){{
+    // family head?
+    if(p.resv&&famResvs.has(p.resv)){{
+      if(seenResv.has(p.resv))continue;
+      if(!hasFemaleInResv(p))continue;  // wait for the $ male
+      seenResv.add(p.resv);
+      const grp=byResv[p.resv]||[];
+      const head=p;
+      const deps=grp.filter(m=>m!==head).sort((a,b)=>{{
+        const aM=a.gender==='ذكر'?0:1,bM=b.gender==='ذكر'?0:1;
+        if(aM!==bM)return aM-bM;
+        return(a.name||'').localeCompare(b.name||'','ar');
+      }});
+      entries.push({{type:'family',head:head,deps:deps,resv:p.resv}});
+      const hph=normPhone(head.phone);if(hph)seenPh.add(hph);
+      continue;
+    }}
+    // individual — dedup by phone
     const ph=normPhone(p.phone);
-    if(ph){{if(seen.has(ph))return false;seen.add(ph);}}
-    return true;
-  }});
+    if(ph&&seenPh.has(ph))continue;
+    if(ph)seenPh.add(ph);
+    entries.push({{type:'individual',pilgrim:p}});
+  }}
+  return entries;
 }}
+
 function renderExport(q,div){{
   if(_expSupv<0){{
     // Stage A: pick supervisor
@@ -1318,64 +1366,153 @@ function renderExport(q,div){{
     div.innerHTML=html;
     return;
   }}
-  // Stage B: pilgrim selection for chosen supervisor
+  // Stage B
   const sv=supvNames[_expSupv];
-  const list=supvPilgrims(_expSupv);
-  const withPhone=list.filter(p=>p.phone).length;
-  const chk=list.filter(p=>p.phone&&!_expUnchecked.has(p.id||p.name)).length;
-  const filt=q?list.filter(p=>norm(p.name).includes(norm(q))):list;
+  const entries=buildExportEntries(_expSupv);
+  // Filter by search
+  const filt=q?entries.filter(e=>{{
+    if(e.type==='individual')return norm(e.pilgrim.name).includes(norm(q));
+    return[e.head,...e.deps].some(m=>norm(m.name).includes(norm(q)));
+  }}):entries;
+  // Counts
+  let withPhone=0,selN=0;
+  entries.forEach(e=>{{
+    if(e.type==='individual'){{
+      const p=e.pilgrim;
+      if(p.phone){{withPhone++;if(isSel(expKey(p),true))selN++;}}
+    }}else{{
+      if(effPhone(e.head,e.head)){{withPhone++;if(isSel(expKey(e.head),true))selN++;}}
+      e.deps.forEach(d=>{{if(effPhone(d,e.head)){{withPhone++;if(isSel(expKey(d),false))selN++;}}}});
+    }}
+  }});
   let html=`<div class="export-hdr">
     <button class="exp-back" onclick="backExp()">←</button>
     <div class="exp-supv">${{shortName(sv)}}</div>
-    <div class="exp-cnt">${{chk}} / ${{withPhone}}</div>
+    <div class="exp-cnt">${{selN}} / ${{withPhone}}</div>
   </div>
   <div class="export-actions">
     <button class="exp-act" onclick="selAllExp()">✓ الكل</button>
     <button class="exp-act" onclick="unselAllExp()">✕ إلغاء</button>
-    <button class="exp-act exp-export" onclick="doExport()">📥 تصدير ${{chk}}</button>
-  </div>
-  <div>`;
-  filt.forEach((p)=>{{
-    const key=p.id||p.name;
-    const has=!!p.phone;
-    const checked=has&&!_expUnchecked.has(key);
-    const isF=p.gender==='أنثى';
-    const mix=hasFemaleInResv(p);
-    const ph=normPhone(p.phone);
-    html+=`<div class="exp-row ${{has?(checked?'checked':''):'disabled'}}" ${{has?`onclick="togExp('${{key.replace(/'/g,"\\\\'")}}')"`:''}}>
-      <div class="exp-check">${{checked?'✓':(has?'':'—')}}</div>
-      <div class="exp-info">
-        <div class="exp-name">${{mix?'<span class="exp-mark">$</span> ':''}}${{shortName(p.name)}}${{isF?' <span style="color:#c0396e">♀</span>':''}}</div>
-        <div class="exp-phone">${{ph||'بدون جوال'}}</div>
-      </div>
-    </div>`;
+    <button class="exp-act exp-export" onclick="doExport()">📥 تصدير ${{selN}}</button>
+  </div>`;
+  filt.forEach(e=>{{
+    if(e.type==='individual'){{
+      const p=e.pilgrim,has=!!p.phone,key=expKey(p);
+      const checked=has&&isSel(key,true);
+      const isF=p.gender==='أنثى';
+      const ph=normPhone(p.phone);
+      const escKey=key.replace(/'/g,"\\\\'");
+      html+=`<div class="exp-row ${{has?(checked?'checked':''):'disabled'}} ${{isF?'female':''}}" ${{has?`onclick="togR('${{escKey}}',1)"`:''}}>
+        <div class="exp-check">${{checked?'✓':(has?'':'—')}}</div>
+        <div class="exp-info">
+          <div class="exp-name">${{shortName(p.name)}}${{isF?' <span style="color:#c0396e">♀</span>':''}}</div>
+          <div class="exp-phone">${{ph||'بدون جوال'}}</div>
+        </div>
+      </div>`;
+    }}else{{
+      const head=e.head,headKey=expKey(head);
+      const headPh=normPhone(head.phone),hasHP=!!headPh;
+      const headChk=hasHP&&isSel(headKey,true);
+      const isF=head.gender==='أنثى';
+      const open=_expOpenFams.has(e.resv);
+      const escK=headKey.replace(/'/g,"\\\\'");
+      html+=`<div class="exp-row ${{hasHP?(headChk?'checked':''):'disabled'}} ${{isF?'female':''}}">
+        <div class="exp-check" ${{hasHP?`onclick="event.stopPropagation();togR('${{escK}}',1)"`:''}}>${{headChk?'✓':(hasHP?'':'—')}}</div>
+        <div class="exp-info" onclick="togFam('${{e.resv}}')" style="cursor:pointer">
+          <div class="exp-name"><span class="exp-mark">$</span> ${{shortName(head.name)}}${{isF?' <span style="color:#c0396e">♀</span>':''}}</div>
+          <div class="exp-phone">${{headPh||'بدون جوال'}}</div>
+        </div>
+        <button class="exp-fam-chev ${{open?'open':''}}" onclick="togFam('${{e.resv}}')">👨‍👩 ${{e.deps.length}} ${{open?'▲':'▼'}}</button>
+      </div>`;
+      if(open){{
+        html+=`<div class="exp-sub"><div class="exp-sub-ttl">تابعون في حجز ${{e.resv}}</div>`;
+        e.deps.forEach(d=>{{
+          const dKey=expKey(d),dEsc=dKey.replace(/'/g,"\\\\'");
+          const ownPh=normPhone(d.phone);
+          const eph=effPhone(d,head);
+          const hasE=!!eph;
+          const chk=hasE&&isSel(dKey,false);
+          const dF=d.gender==='أنثى';
+          let phDisp;
+          if(ownPh){{phDisp=ownPh+(ownPh===headPh?' (نفس الرئيسي)':'');}}
+          else if(headPh){{phDisp='🔗 '+headPh+' (مع الرئيسي)';}}
+          else{{phDisp='بدون جوال';}}
+          html+=`<div class="exp-sub-row ${{hasE?(chk?'checked':''):'no-phone'}} ${{dF?'female':''}}" ${{hasE?`onclick="togR('${{dEsc}}',0)"`:''}}>
+            <div class="exp-sub-check">${{chk?'✓':''}}</div>
+            <div style="flex:1;min-width:0">
+              <div class="exp-sub-name">${{shortName(d.name)}}${{dF?' <span style="color:#c0396e">♀</span>':''}}</div>
+              <div class="exp-sub-phone">${{phDisp}}</div>
+            </div>
+          </div>`;
+        }});
+        html+='</div>';
+      }}
+    }}
   }});
-  html+=`</div>`;
   div.innerHTML=html;
 }}
-function pickExp(idx){{_expSupv=idx;_expUnchecked=new Set();inp().value='';inp().placeholder='ابحث في الحجاج...';render('');}}
-function backExp(){{_expSupv=-1;_expUnchecked=new Set();inp().value='';inp().placeholder='ابحث في المشرفين...';render('');}}
-function togExp(key){{if(_expUnchecked.has(key))_expUnchecked.delete(key);else _expUnchecked.add(key);render(inp().value.trim());}}
-function selAllExp(){{_expUnchecked=new Set();render(inp().value.trim());}}
-function unselAllExp(){{
-  supvPilgrims(_expSupv).forEach(p=>{{if(p.phone)_expUnchecked.add(p.id||p.name);}});
+
+function pickExp(idx){{_expSupv=idx;_expState=new Map();_expOpenFams=new Set();inp().value='';inp().placeholder='ابحث في الحجاج...';render('');}}
+function backExp(){{_expSupv=-1;_expState=new Map();_expOpenFams=new Set();inp().value='';inp().placeholder='ابحث في المشرفين...';render('');}}
+function togR(key,defOn){{togSel(key,!!defOn);render(inp().value.trim());}}
+function togFam(resv){{if(_expOpenFams.has(resv))_expOpenFams.delete(resv);else _expOpenFams.add(resv);render(inp().value.trim());}}
+function selAllExp(){{
+  _expState=new Map();
+  buildExportEntries(_expSupv).forEach(e=>{{
+    if(e.type==='individual'){{if(e.pilgrim.phone)_expState.set(expKey(e.pilgrim),true);}}
+    else{{
+      if(e.head.phone)_expState.set(expKey(e.head),true);
+      e.deps.forEach(d=>{{if(effPhone(d,e.head))_expState.set(expKey(d),true);}});
+    }}
+  }});
   render(inp().value.trim());
 }}
+function unselAllExp(){{
+  _expState=new Map();
+  buildExportEntries(_expSupv).forEach(e=>{{
+    if(e.type==='individual')_expState.set(expKey(e.pilgrim),false);
+    else{{_expState.set(expKey(e.head),false);e.deps.forEach(d=>_expState.set(expKey(d),false));}}
+  }});
+  render(inp().value.trim());
+}}
+
 function doExport(){{
   const sv=supvNames[_expSupv];
-  const list=supvPilgrims(_expSupv).filter(p=>p.phone&&!_expUnchecked.has(p.id||p.name));
-  if(!list.length){{alert('لا يوجد أرقام محددة');return;}}
+  const entries=buildExportEntries(_expSupv);
+  const out=[];const seenPh=new Set();
+  entries.forEach(e=>{{
+    if(e.type==='individual'){{
+      const p=e.pilgrim;
+      if(!p.phone||!isSel(expKey(p),true))return;
+      const ph=normPhone(p.phone);
+      if(!ph||seenPh.has(ph))return;
+      seenPh.add(ph);
+      const mark=hasFemaleInResv(p)?'$ ':'';
+      out.push({{name:mark+shortName(p.name),phone:ph}});
+    }}else{{
+      const head=e.head;
+      if(head.phone&&isSel(expKey(head),true)){{
+        const ph=normPhone(head.phone);
+        if(ph&&!seenPh.has(ph)){{seenPh.add(ph);out.push({{name:'$ '+shortName(head.name),phone:ph}});}}
+      }}
+      e.deps.forEach(d=>{{
+        const eph=effPhone(d,head);
+        if(!eph||!isSel(expKey(d),false)||seenPh.has(eph))return;
+        seenPh.add(eph);
+        const mark=hasFemaleInResv(d)?'$ ':'';
+        out.push({{name:mark+shortName(d.name),phone:eph}});
+      }});
+    }}
+  }});
+  if(!out.length){{alert('لا يوجد أرقام محددة');return;}}
   let vcf='';
-  list.forEach((p,i)=>{{
-    const num=(i+1);
-    const mark=hasFemaleInResv(p)?'$ ':'';
-    const fn=num+' | '+mark+shortName(p.name);
-    const ph=normPhone(p.phone);
+  out.forEach((c,i)=>{{
+    const fn=(i+1)+' | '+c.name;
     vcf+='BEGIN:VCARD\\r\\n';
     vcf+='VERSION:3.0\\r\\n';
     vcf+='FN:'+fn+'\\r\\n';
     vcf+='N:'+fn+';;;;\\r\\n';
-    vcf+='TEL;TYPE=CELL:'+ph+'\\r\\n';
+    vcf+='TEL;TYPE=CELL:'+c.phone+'\\r\\n';
     vcf+='END:VCARD\\r\\n';
   }});
   const safe=shortName(sv).replace(/\\s+/g,'_').replace(/[^\\u0600-\\u06FF\\w_]/g,'');
@@ -1431,7 +1568,7 @@ def make_landing(campaigns):
         '.foot{margin-top:30px;color:rgba(255,255,255,.4);font-size:.72rem}'
         '</style></head><body>'
         '<div class="home-head"><span class="k">🕋</span><h1>حملات الحج</h1>'
-        '<div class="ver-badge">v3.4</div>'
+        '<div class="ver-badge">v3.5</div>'
         '<p>اختر الحملة والخدمة</p>'
         '<div class="upd-date">آخر تحديث للبيانات: '+__import__('datetime').datetime.now().strftime('%d/%m/%Y')+'</div>'
         '</div>'
