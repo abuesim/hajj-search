@@ -416,7 +416,7 @@ def make_index(DECRYPT_JS, LOCK_HTML, H1, NAV, QR, CARDFILE, SWITCHER, REPORTS_J
 <header>
   {SWITCHER}
   <div class="hdr-row">
-    <h1>🕋 {H1} <span style="font-size:.55em;opacity:.6;font-weight:400">v1.2</span></h1>
+    <h1>🕋 {H1} <span style="font-size:.55em;opacity:.6;font-weight:400">v3.5</span></h1>
     <div style="display:flex;gap:5px;flex-shrink:0">{'<a href="'+DASH_LINK+'" class="nav-link">📊 لوحة</a>' if DASH_LINK else ''}{'<a href="'+SUPV_LINK+'" class="nav-link">👥 مشرفين</a>' if SUPV_LINK else ''}<a href="{REPORTS_LINK}" class="nav-link">🚩 بلاغات</a><a href="{NAV}" class="nav-link">📋 بيانات</a></div>
   </div>
   <div class="search-wrap">
@@ -757,7 +757,7 @@ def make_scan(DECRYPT_JS, LOCK_HTML, SWITCHER, SEARCH_LINK):
 {LOCK_HTML}
 <header>
   {SWITCHER}
-  <div class="hdr-row"><h1>📷 البحث السريع</h1><a href="{SEARCH_LINK}" class="nav-link">🔍 بحث عادي</a></div>
+  <div class="hdr-row"><h1>📷 البحث السريع <span style="font-size:.6em;opacity:.6;font-weight:400">v3.5</span></h1><a href="{SEARCH_LINK}" class="nav-link">🔍 بحث عادي</a></div>
 </header>
 <div id="scanWrap"><div id="reader"></div><div id="scanHint">📷 وجّه الكاميرا على باركود الهوية</div></div>
 <div id="result"></div>
@@ -863,7 +863,7 @@ def make_dashboard(DECRYPT_JS, LOCK_HTML, H1, SEARCH_LINK, REPORTS_LINK, MANIFES
 <header>
   {SWITCHER}
   <div class="hdr-row">
-    <h1>📊 {H1}</h1>
+    <h1>📊 {H1} <span style="font-size:.6em;opacity:.6;font-weight:400">v3.5</span></h1>
     <div style="display:flex;gap:5px;flex-shrink:0">
       <a href="{SEARCH_LINK}" class="nav-link">🔍 بحث</a>
       <a href="{REPORTS_LINK}" class="nav-link">🚩 بلاغات</a>
@@ -1087,7 +1087,7 @@ def make_supervisors(DECRYPT_JS, LOCK_HTML, H1, SEARCH_LINK, SWITCHER):
 <header>
   {SWITCHER}
   <div class="hdr-row">
-    <h1>👥 {H1}</h1>
+    <h1>👥 {H1} <span style="font-size:.6em;opacity:.6;font-weight:400">v3.5</span></h1>
     <a href="{SEARCH_LINK}" class="nav-link">🔍 بحث</a>
   </div>
   <div class="mode-toggle">

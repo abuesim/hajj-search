@@ -8,11 +8,11 @@ BASE = '/Users/m/Documents/est3lam'
 
 CAMPAIGNS = [
     {
-        'csv': '/Users/m/Downloads/المحيميد 03.CSV',
+        'csv': '/Users/m/Downloads/المحيميد 04.CSV',
         'out': f'{BASE}/pilgrims_data.json',
     },
     {
-        'csv': '/Users/m/Downloads/الرويس 03.CSV',
+        'csv': '/Users/m/Downloads/الرويس 04.CSV',
         'out': f'{BASE}/ruwais_data.json',
     },
 ]
