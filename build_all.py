@@ -1544,14 +1544,19 @@ function doExport(platform){{
   }});
   const safe=shortName(sv).replace(/\\s+/g,'_').replace(/[^\\u0600-\\u06FF\\w_]/g,'');
   const fname='حجاج_'+safe+'.vcf';
-  if(platform==='ios'){{
-    // iOS: data URI يفتح Contacts importer مباشرة
-    const b64=btoa(unescape(encodeURIComponent(vcf)));
-    window.location.href='data:text/vcard;base64,'+b64;
+  // UTF-8 BOM + encode لضمان الأحرف العربية
+  const bom=new Uint8Array([0xEF,0xBB,0xBF]);
+  const enc=new TextEncoder();
+  const body=enc.encode(vcf);
+  const merged=new Uint8Array(bom.length+body.length);
+  merged.set(bom);merged.set(body,bom.length);
+  const blob=new Blob([merged],{{type:'text/x-vcard'}});
+  const url=URL.createObjectURL(blob);
+  // iOS Safari: a.download لا يعمل — location.href يفتح "إضافة جهات الاتصال" مباشرة
+  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&'ontouchend' in document);
+  if(isIOS){{
+    window.location.href=url;
   }}else{{
-    // Android/Desktop: تنزيل blob كملف .vcf
-    const blob=new Blob([vcf],{{type:'text/vcard;charset=utf-8'}});
-    const url=URL.createObjectURL(blob);
     const a=document.createElement('a');
     a.href=url;a.download=fname;a.style.display='none';
     document.body.appendChild(a);a.click();
