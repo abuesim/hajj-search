@@ -84,7 +84,7 @@ def pwa_head(webmanifest, theme, app_name, icon180):
             '<meta name="apple-mobile-web-app-title" content="'+app_name+'">'
             '<link rel="apple-touch-icon" href="'+icon180+'">')
 
-SW_JS = """const C='hajj-v39';
+SW_JS = """const C='hajj-v40';
 self.addEventListener('install',e=>self.skipWaiting());
 self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));
 self.addEventListener('fetch',e=>{const r=e.request;if(r.method!=='GET')return;e.respondWith(fetch(r).then(resp=>{const cp=resp.clone();caches.open(C).then(c=>c.put(r,cp));return resp}).catch(()=>caches.match(r)))});"""
@@ -1552,11 +1552,11 @@ function doExport(platform){{
   merged.set(bom);merged.set(body,bom.length);
   const blob=new Blob([merged],{{type:'text/x-vcard'}});
   const url=URL.createObjectURL(blob);
-  // iOS Safari: a.download لا يعمل — location.href يفتح "إضافة جهات الاتصال" مباشرة
-  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&'ontouchend' in document);
-  if(isIOS){{
+  if(platform==='ios'){{
+    // iOS Safari: a.download لا يعمل — location.href يفتح "إضافة جهات الاتصال" مباشرة
     window.location.href=url;
   }}else{{
+    // Android/Desktop: تنزيل الملف
     const a=document.createElement('a');
     a.href=url;a.download=fname;a.style.display='none';
     document.body.appendChild(a);a.click();
