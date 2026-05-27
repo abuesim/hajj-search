@@ -1529,8 +1529,7 @@ function doExport(){{
   }});
   const safe=shortName(sv).replace(/\\s+/g,'_').replace(/[^\\u0600-\\u06FF\\w_]/g,'');
   const fname='حجاج_'+safe+'.vcf';
-  // UTF-8 BOM لإجبار iOS على قراءة العربي بشكل صحيح
-  const blob=new Blob(["\\uFEFF"+vcf],{{type:'text/vcard;charset=utf-8'}});
+  const blob=new Blob([vcf],{{type:'text/vcard;charset=utf-8'}});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');a.href=url;a.download=fname;document.body.appendChild(a);a.click();document.body.removeChild(a);
   setTimeout(()=>URL.revokeObjectURL(url),1500);
