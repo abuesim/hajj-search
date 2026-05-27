@@ -84,7 +84,7 @@ def pwa_head(webmanifest, theme, app_name, icon180):
             '<meta name="apple-mobile-web-app-title" content="'+app_name+'">'
             '<link rel="apple-touch-icon" href="'+icon180+'">')
 
-SW_JS = """const C='hajj-v38';
+SW_JS = """const C='hajj-v39';
 self.addEventListener('install',e=>self.skipWaiting());
 self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));
 self.addEventListener('fetch',e=>{const r=e.request;if(r.method!=='GET')return;e.respondWith(fetch(r).then(resp=>{const cp=resp.clone();caches.open(C).then(c=>c.put(r,cp));return resp}).catch(()=>caches.match(r)))});"""
@@ -416,7 +416,7 @@ def make_index(DECRYPT_JS, LOCK_HTML, H1, NAV, QR, CARDFILE, SWITCHER, REPORTS_J
 <header>
   {SWITCHER}
   <div class="hdr-row">
-    <h1>🕋 {H1} <span style="font-size:.55em;opacity:.6;font-weight:400">v3.8</span></h1>
+    <h1>🕋 {H1} <span style="font-size:.55em;opacity:.6;font-weight:400">v3.9</span></h1>
     <div style="display:flex;gap:5px;flex-shrink:0">{'<a href="'+DASH_LINK+'" class="nav-link">📊 لوحة</a>' if DASH_LINK else ''}{'<a href="'+SUPV_LINK+'" class="nav-link">👥 مشرفين</a>' if SUPV_LINK else ''}<a href="{REPORTS_LINK}" class="nav-link">🚩 بلاغات</a><a href="{NAV}" class="nav-link">📋 بيانات</a></div>
   </div>
   <div class="search-wrap">
@@ -757,7 +757,7 @@ def make_scan(DECRYPT_JS, LOCK_HTML, SWITCHER, SEARCH_LINK):
 {LOCK_HTML}
 <header>
   {SWITCHER}
-  <div class="hdr-row"><h1>📷 البحث السريع <span style="font-size:.6em;opacity:.6;font-weight:400">v3.8</span></h1><a href="{SEARCH_LINK}" class="nav-link">🔍 بحث عادي</a></div>
+  <div class="hdr-row"><h1>📷 البحث السريع <span style="font-size:.6em;opacity:.6;font-weight:400">v3.9</span></h1><a href="{SEARCH_LINK}" class="nav-link">🔍 بحث عادي</a></div>
 </header>
 <div id="scanWrap"><div id="reader"></div><div id="scanHint">📷 وجّه الكاميرا على باركود الهوية</div></div>
 <div id="result"></div>
@@ -863,7 +863,7 @@ def make_dashboard(DECRYPT_JS, LOCK_HTML, H1, SEARCH_LINK, REPORTS_LINK, MANIFES
 <header>
   {SWITCHER}
   <div class="hdr-row">
-    <h1>📊 {H1} <span style="font-size:.6em;opacity:.6;font-weight:400">v3.8</span></h1>
+    <h1>📊 {H1} <span style="font-size:.6em;opacity:.6;font-weight:400">v3.9</span></h1>
     <div style="display:flex;gap:5px;flex-shrink:0">
       <a href="{SEARCH_LINK}" class="nav-link">🔍 بحث</a>
       <a href="{REPORTS_LINK}" class="nav-link">🚩 بلاغات</a>
@@ -1027,10 +1027,14 @@ def make_supervisors(DECRYPT_JS, LOCK_HTML, H1, SEARCH_LINK, SWITCHER):
   .exp-back:active{{transform:scale(.94)}}
   .exp-supv{{flex:1;color:#f5d06e;font-weight:800;font-size:1rem;text-align:center}}
   .exp-cnt{{color:rgba(255,255,255,.85);font-size:.78rem;font-weight:700;background:rgba(245,208,110,.15);border-radius:20px;padding:3px 10px;flex-shrink:0;direction:ltr}}
-  .export-actions{{display:flex;gap:6px;margin-bottom:12px}}
+  .export-actions{{display:flex;gap:6px;margin-bottom:8px}}
   .exp-act{{flex:1;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);color:white;border-radius:10px;padding:9px 6px;font-size:.78rem;font-weight:700;cursor:pointer;font-family:inherit;transition:.1s}}
   .exp-act:active{{transform:scale(.95)}}
-  .exp-export{{background:#f5d06e!important;color:#0d4f3c!important;border:none!important;font-size:.85rem!important;font-weight:800!important;flex:1.5!important}}
+  .exp-export-row{{display:flex;gap:6px;margin-bottom:12px}}
+  .exp-platform{{flex:1;background:#f5d06e;color:#0d4f3c;border:none;border-radius:10px;padding:11px 8px;font-size:.88rem;font-weight:800;cursor:pointer;font-family:inherit;transition:.1s;display:flex;align-items:center;justify-content:center;gap:6px}}
+  .exp-platform:active{{transform:scale(.95)}}
+  .exp-platform.ios{{background:#e8edf3;color:#1d1d1f}}
+  .exp-platform.android{{background:#a8e6a3;color:#0d4f3c}}
   .exp-row{{display:flex;align-items:center;gap:11px;background:white;border-radius:11px;padding:10px 12px;margin-bottom:6px;cursor:pointer;transition:background .1s;animation:fadeUp .15s ease}}
   .exp-row.checked{{background:#e8f5ee}}
   .exp-row.disabled{{background:#f0f0f0;opacity:.55;cursor:not-allowed}}
@@ -1087,7 +1091,7 @@ def make_supervisors(DECRYPT_JS, LOCK_HTML, H1, SEARCH_LINK, SWITCHER):
 <header>
   {SWITCHER}
   <div class="hdr-row">
-    <h1>👥 {H1} <span style="font-size:.6em;opacity:.6;font-weight:400">v3.8</span></h1>
+    <h1>👥 {H1} <span style="font-size:.6em;opacity:.6;font-weight:400">v3.9</span></h1>
     <a href="{SEARCH_LINK}" class="nav-link">🔍 بحث</a>
   </div>
   <div class="mode-toggle">
@@ -1408,7 +1412,10 @@ function renderExport(q,div){{
   <div class="export-actions">
     <button class="exp-act" onclick="selAllExp()">✓ الكل</button>
     <button class="exp-act" onclick="unselAllExp()">✕ إلغاء</button>
-    <button class="exp-act exp-export" onclick="doExport()">📥 تصدير ${{selN}}</button>
+  </div>
+  <div class="exp-export-row">
+    <button class="exp-platform ios" onclick="doExport('ios')">🍎 آيفون · ${{selN}}</button>
+    <button class="exp-platform android" onclick="doExport('android')">🤖 أندرويد · ${{selN}}</button>
   </div>`;
   filt.forEach(e=>{{
     if(e.type==='individual'){{
@@ -1491,7 +1498,7 @@ function unselAllExp(){{
   render(inp().value.trim());
 }}
 
-function doExport(){{
+function doExport(platform){{
   const sv=supvNames[_expSupv];
   const entries=buildExportEntries(_expSupv);
   const out=[];const seenPh=new Set();
@@ -1537,13 +1544,12 @@ function doExport(){{
   }});
   const safe=shortName(sv).replace(/\\s+/g,'_').replace(/[^\\u0600-\\u06FF\\w_]/g,'');
   const fname='حجاج_'+safe+'.vcf';
-  // iOS Safari لا يدعم a.download مع blob — نستخدم data URI بدلاً
-  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&'ontouchend' in document);
-  if(isIOS){{
+  if(platform==='ios'){{
+    // iOS: data URI يفتح Contacts importer مباشرة
     const b64=btoa(unescape(encodeURIComponent(vcf)));
-    const dataUri='data:text/vcard;base64,'+b64;
-    window.location.href=dataUri;
+    window.location.href='data:text/vcard;base64,'+b64;
   }}else{{
+    // Android/Desktop: تنزيل blob كملف .vcf
     const blob=new Blob([vcf],{{type:'text/vcard;charset=utf-8'}});
     const url=URL.createObjectURL(blob);
     const a=document.createElement('a');
@@ -1598,7 +1604,7 @@ def make_landing(campaigns):
         '.foot{margin-top:30px;color:rgba(255,255,255,.4);font-size:.72rem}'
         '</style></head><body>'
         '<div class="home-head"><span class="k">🕋</span><h1>حملات الحج</h1>'
-        '<div class="ver-badge">v3.8</div>'
+        '<div class="ver-badge">v3.9</div>'
         '<p>اختر الحملة والخدمة</p>'
         '<div class="upd-date">آخر تحديث للبيانات: '+__import__('datetime').datetime.now().strftime('%d/%m/%Y')+'</div>'
         '</div>'

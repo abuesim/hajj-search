@@ -113,7 +113,7 @@ __LOCK_HTML__
 <div class="app-header">
   <div style="display:flex;align-items:center;gap:8px">
     <a href="index.html" style="background:rgba(255,255,255,.15);color:var(--gold);border-radius:8px;padding:5px 10px;font-size:.78rem;font-weight:700;text-decoration:none;border:1px solid rgba(255,255,255,.2)">🔍 بحث الحجاج</a>
-    <h1>📋 بيانات الركاب <span style="font-size:.6em;opacity:.6;font-weight:400">v3.7</span></h1>
+    <h1>📋 بيانات الركاب <span style="font-size:.6em;opacity:.6;font-weight:400">v3.9</span></h1>
   </div>
   <div style="display:flex;gap:8px">
     <button class="btn btn-ghost" id="btn-back" onclick="goDash()" style="display:none">← رجوع</button>
