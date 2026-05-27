@@ -1550,7 +1550,7 @@ function doExport(){{
   if(isIOS){{
     const b64=btoa(unescape(encodeURIComponent(vcf)));
     const dataUri='data:text/vcard;base64,'+b64;
-    window.open(dataUri,'_blank');
+    window.location.href=dataUri;
   }}else{{
     const blob=new Blob([vcf],{{type:'text/vcard;charset=utf-8'}});
     const url=URL.createObjectURL(blob);
