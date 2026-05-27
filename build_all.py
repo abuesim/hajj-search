@@ -7,7 +7,7 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
-BASE = '/Users/salehalskakir/Documents/hajj-search'
+BASE = '/Users/m/Documents/est3lam'
 import re, subprocess, sys
 import gen_manifest
 PASSWORD_SEARCH   = b'112233'
@@ -84,7 +84,7 @@ def pwa_head(webmanifest, theme, app_name, icon180):
             '<meta name="apple-mobile-web-app-title" content="'+app_name+'">'
             '<link rel="apple-touch-icon" href="'+icon180+'">')
 
-SW_JS = """const C='hajj-v1';
+SW_JS = """const C='hajj-v38';
 self.addEventListener('install',e=>self.skipWaiting());
 self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));
 self.addEventListener('fetch',e=>{const r=e.request;if(r.method!=='GET')return;e.respondWith(fetch(r).then(resp=>{const cp=resp.clone();caches.open(C).then(c=>c.put(r,cp));return resp}).catch(()=>caches.match(r)))});"""
