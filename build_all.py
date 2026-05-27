@@ -1507,7 +1507,7 @@ function doExport(){{
   if(!out.length){{alert('لا يوجد أرقام محددة');return;}}
   let vcf='';
   out.forEach((c,i)=>{{
-    const fn=(i+1)+' | '+c.name;
+    const fn='47 | '+c.name;
     vcf+='BEGIN:VCARD\\r\\n';
     vcf+='VERSION:3.0\\r\\n';
     vcf+='FN:'+fn+'\\r\\n';
