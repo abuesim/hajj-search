@@ -1434,7 +1434,7 @@ function renderExport(q,div){{
       html+=`<div class="exp-row ${{hasHP?(headChk?'checked':''):'disabled'}} ${{isF?'female':''}}">
         <div class="exp-check" ${{hasHP?`onclick="event.stopPropagation();togR('${{escK}}',1)"`:''}}>${{headChk?'✓':(hasHP?'':'—')}}</div>
         <div class="exp-info" onclick="togFam('${{e.resv}}')" style="cursor:pointer">
-          <div class="exp-name"><span class="exp-mark">$</span> ${{shortName(head.name)}}${{isF?' <span style="color:#c0396e">♀</span>':''}}</div>
+          <div class="exp-name"><span class="exp-mark">ء</span> ${{shortName(head.name)}}${{isF?' <span style="color:#c0396e">♀</span>':''}}</div>
           <div class="exp-phone">${{headPh||'بدون جوال'}}</div>
         </div>
         <button class="exp-fam-chev ${{open?'open':''}}" onclick="togFam('${{e.resv}}')">👨‍👩 ${{e.deps.length}} ${{open?'▲':'▼'}}</button>
@@ -1502,19 +1502,19 @@ function doExport(){{
       const ph=normPhone(p.phone);
       if(!ph||seenPh.has(ph))return;
       seenPh.add(ph);
-      const mark=hasFemaleInResv(p)?'$ ':'';
+      const mark=hasFemaleInResv(p)?'ء ':'';
       out.push({{name:mark+shortName(p.name),phone:ph}});
     }}else{{
       const head=e.head;
       if(head.phone&&isSel(expKey(head),true)){{
         const ph=normPhone(head.phone);
-        if(ph&&!seenPh.has(ph)){{seenPh.add(ph);out.push({{name:'$ '+shortName(head.name),phone:ph}});}}
+        if(ph&&!seenPh.has(ph)){{seenPh.add(ph);out.push({{name:'ء '+shortName(head.name),phone:ph}});}}
       }}
       e.deps.forEach(d=>{{
         const eph=effPhone(d,head);
         if(!eph||!isSel(expKey(d),false)||seenPh.has(eph))return;
         seenPh.add(eph);
-        const mark=hasFemaleInResv(d)?'$ ':'';
+        const mark=hasFemaleInResv(d)?'ء ':'';
         out.push({{name:mark+shortName(d.name),phone:eph}});
       }});
     }}
@@ -1524,7 +1524,7 @@ function doExport(){{
   out.forEach((c,i)=>{{
     const fn='47 '+c.name;
     // تنظيف $ و | من N (يبقى في FN للعرض)
-    const cleanName=c.name.replace(/[\\$\\|]/g,'').trim();
+    const cleanName=c.name.replace(/^ء\\s+/,'').replace(/\\|/g,'').trim();
     // 00 → + (صيغة E.164)
     let phoneFormatted=c.phone;
     if(phoneFormatted.startsWith('00'))phoneFormatted=phoneFormatted.replace(/^00/,'+');
